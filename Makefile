@@ -7,6 +7,13 @@ PYTHONPATH := $(ROOT_DIR)/src
 export msg
 export PYTHONPATH
 
+CURRENT := $$(svu current --strip-prefix)
+NEXT := $$(svu next --strip-prefix)
+
+echo:
+	@echo $(CURRENT)
+	@echo $(NEXT)
+
 build: clean
 	@source venv/bin/activate && python3 -m build --wheel
 
@@ -17,7 +24,7 @@ clean:
 commit: tests tox
 	@git add .
 	@git commit --quiet -a -m "$${msg:-fix}" || true
-	@git tag $$(svu next --strip-prefix)
+	@[ $$CURRENT = $$NEXT ] || git tag $$(svu next --strip-prefix)
 	@git push --quiet --tags
 
 coverage:
