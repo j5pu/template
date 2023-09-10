@@ -1,7 +1,7 @@
 [project]
 name = "huti"
 description = "Python helpers and utilities"
-dynamic = ["version"]
+version = "0.1.0"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
@@ -53,10 +53,8 @@ tests = [
 [tool.setuptools.packages.find]
 where = ["src"]  # ["."] by default
 
-[tool.setuptools_scm]
-
 [build-system]
-requires = ['setuptools', 'setuptools_scm>=6.2', 'wheel']
+requires = ['setuptools', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [tool.pytest.ini_options] # https://docs.pytest.org/en/stable/reference/reference.html#ini-options-ref

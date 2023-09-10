@@ -7,9 +7,6 @@ PYTHONPATH := $(ROOT_DIR)/src
 export msg
 export PYTHONPATH
 
-CURRENT := $$(svu current --strip-prefix)
-NEXT := $$(svu next --strip-prefix)
-
 echo:
 	@echo $(CURRENT)
 	@echo $(NEXT)
@@ -24,15 +21,13 @@ clean:
 commit: tests tox
 	@git add .
 	@git commit --quiet -a -m "$${msg:-fix}" || true
-	@[ $$CURRENT = $$NEXT ] || git tag $$(svu next --strip-prefix)
-	@git push --quiet --tags
+	@git push --quiet
 
 coverage:
 	@source venv/bin/activate && coverage run -m pytest && coverage report
 
 
 publish: commit
-
 	@source venv/bin/activate && twine upload -u __token__ dist/*
 	@make clean
 
