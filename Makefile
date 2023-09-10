@@ -32,6 +32,7 @@ coverage:
 
 
 publish: commit
+
 	@source venv/bin/activate && twine upload -u __token__ dist/*
 	@make clean
 
