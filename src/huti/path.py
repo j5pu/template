@@ -633,7 +633,6 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             ) == self.__class__('/'):
                 return None
 
-
     def find_up(self, function=PathIs.IS_FILE, name='__init__.py', uppermost=False):
         """
         Find file or dir up.
@@ -794,7 +793,6 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
                 path.chown(passwd=passwd, effective_ids=effective_ids, follow_symlinks=follow_symlinks)
         return path
 
-
     def mv(self, dest):
         """
         Move.
@@ -865,7 +863,6 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         """
         return self.__class__(os.path.realpath(self, strict=not exception))
 
-
     def relative(self, path):
         """
         Return relative to path if is relative to path else None.
@@ -926,6 +923,38 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
                 *(["-rf"] if self.is_dir() else []),
                 path.resolve() if follow_symlinks else path,
             ], capture_output=True)
+
+    def rm_empty(self, preserve=True):
+        """
+        Remove empty directories recursive
+
+        Examples:
+            >>> from huti.path import Path
+            >>>
+            >>> with Path.tempdir() as tmp:
+            ...     first = tmp("1")
+            ...
+            ...     _ = tmp('1/2/3/4')
+            ...     first.rm_empty()
+            ...     assert first.exists() is True
+            ...     assert Path("1").exists() is False
+            ...
+            ...     _ = tmp('1/2/3/4')
+            ...     first.rm_empty(preserve=False)
+            ...     assert first.exists() is False
+            ...
+            ...     _ = tmp('1/2/3/4/5/6/7.py', file=PathIs.IS_FILE)
+            ...     first.rm_empty()
+            ...     assert first.exists() is True
+
+        Args:
+            preserve: preserve top directory (default: True).
+
+        """
+        for directory, _, _ in os.walk(self, topdown=False):
+            directory = self.__class__(directory).absolute()
+            if len(list(directory.iterdir())) == 0 and (not preserve or (directory != self.absolute() and preserve)):
+                os.rmdir(directory)
 
     def setid(self, name=None, uid=True, effective_ids=False, follow_symlinks=False):
         """

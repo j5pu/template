@@ -1,6 +1,6 @@
 .PHONY: clean publish tests version
 
-msg :=
+msg := rm if empty path
 SHELL := $(shell bash -c 'command -v bash')
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 PYTHONPATH := $(ROOT_DIR)/src

@@ -14,12 +14,16 @@ from typing import TypeAlias
 from typing import Union
 
 __all__ = (
+    "AnyIO",
     "ExcType",
     "GitScheme",
     "PathType",
+    "AnyPath",
+    "StrOrBytesPath",
     "TemporaryFileType"
 )
 
+AnyIO = IO[AnyStr]
 ExcType: TypeAlias = Type[Exception] | tuple[Type[Exception], ...]
 GitScheme = Literal["git+file", "git+https", "git+ssh", "https", "ssh"]
 PathType: TypeAlias = 'Path'
