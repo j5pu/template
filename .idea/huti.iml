@@ -3,9 +3,23 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.pytest_cache" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/src/huti.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.11 (huti)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="sitec" />
+    <orderEntry type="module" module-name="puntos" />
+    <orderEntry type="module" module-name="gitp" />
+    <orderEntry type="module" module-name="bapy" />
+    <orderEntry type="module" module-name="rclib" />
+    <orderEntry type="module" module-name="sstr" />
+    <orderEntry type="module" module-name="upins" />
+    <orderEntry type="module" module-name="prel" />
+    <orderEntry type="module" module-name="turbogit" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />

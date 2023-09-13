@@ -2,5 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Archive/bapy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Archive/turbogit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../gitp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../puntos" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../sitec" vcs="Git" />
   </component>
 </project>

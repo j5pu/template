@@ -7,10 +7,6 @@ PYTHONPATH := $(ROOT_DIR)/src
 export msg
 export PYTHONPATH
 
-echo:
-	@echo $(CURRENT)
-	@echo $(NEXT)
-
 build: clean
 	@source venv/bin/activate && python3 -m build --wheel
 
@@ -30,6 +26,7 @@ coverage:
 publish: commit
 	@source venv/bin/activate && twine upload -u __token__ dist/*
 	@make clean
+
 
 requirements:
 	@test -d venv || python3.11 -m venv venv
