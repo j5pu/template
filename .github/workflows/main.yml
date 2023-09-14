@@ -44,6 +44,7 @@ jobs:
           make brew
           python -m pip install .[tests]
 #          make requirements
+
       - name: pytest
         run: PYTHONHASHSEED=123345 make tests
 
@@ -125,6 +126,11 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.ref_name }}
+
+      - name: Build
+        run: |
+          python -m pip install build
+      #          make requirements
 
       - name: Python Semantic Release
         id: release
