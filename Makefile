@@ -25,13 +25,7 @@ coverage:
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && coverage run -m pytest && coverage report
 
 
-publish: commit
-	@NEXT=$$(svu next --strip-prefix) && \
-		CURRENT=$$(svu --strip-prefix) && \
-		[ $$NEXT != $$CURRENT ] &&
-		echo $$CURRENT $$NEXT \
-		git tag $$NEXT && \
-		git push --quiet --tags
+publish: tag
 	@make build
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && twine upload -u __token__ dist/*
 	@make clean
@@ -43,12 +37,14 @@ requirements:
 		pip-compile --all-extras --no-annotate --quiet -o /tmp/requirements.txt pyproject.toml && \
 		python3 -m pip  install -r /tmp/requirements.txt
 
-tests: build
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && pytest
-
-tox:
-	@eval "$$(pyenv init --path)";{  [ "$${CI-}" ] || source venv/bin/activate; } && \
-		PY_IGNORE_IMPORTMISMATCH=1 tox -p auto
+tag: commit
+	@NEXT=$$(svu next --strip-prefix) && \
+		CURRENT=$$(svu --strip-prefix) && \
+		TAG=$$(git tag --list --sort=-v:refname | head -n1) && \
+		{ test $$NEXT != $$CURRENT || test $$NEXT != $$TAG; } && \
+		CHANGED=1 && echo $$CURRENT $$NEXT $$TAG && \
+		git tag $$NEXT && \
+		git push --quiet --tags  || true
 
 pyenv:
 	@pyenv install 3.10
@@ -59,3 +55,10 @@ secrets:
 	@gh secret set GH_TOKEN --body "$$GITHUB_TOKEN"
 	@grep -v GITHUB_ /Users/j5pu/secrets/profile.d/secrets.sh > /tmp/secrets
 	@gh secret set -f  /tmp/secrets
+
+tests: build
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && pytest
+
+tox:
+	@eval "$$(pyenv init --path)";{  [ "$${CI-}" ] || source venv/bin/activate; } && \
+		PY_IGNORE_IMPORTMISMATCH=1 tox -p auto
