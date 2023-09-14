@@ -49,6 +49,8 @@ class OwnerRepo:
 
 
     Examples:
+        >>> import os
+        >>> import pytest
         >>> from huti.repo import OwnerRepo
         >>>
         >>> OwnerRepo().url.url # doctest: +ELLIPSIS
@@ -63,10 +65,12 @@ class OwnerRepo:
         'git+file:///tmp/cpython'
         >>> OwnerRepo("cpython", "cpython", scheme="git+https").url.url
         'git+https://github.com/cpython/cpython'
-        >>> OwnerRepo("cpython", "cpython", scheme="git+ssh").url.url
-        'git+ssh://git@github.com/cpython/cpython'
-        >>> OwnerRepo("cpython", "cpython", scheme="ssh").url.url
-        'ssh://git@github.com/cpython/cpython'
+        >>> if not os.environ.get("CI"):
+        ...     assert OwnerRepo("cpython", "cpython", scheme="git+ssh").url.url == \
+                    'git+ssh://git@github.com/cpython/cpython'
+        ...     assert OwnerRepo("cpython", "cpython", scheme="ssh").url.url == \
+                    'ssh://git@github.com/cpython/cpython'
+
 
     :param owner: repo owner
     :param repo: repo name

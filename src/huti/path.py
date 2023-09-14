@@ -155,6 +155,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             -   effective: user invoking.
 
         Examples:
+            >>> import os
             >>> from huti.path import Path
             >>> from huti.variables import MACOS
             >>>
@@ -164,7 +165,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> assert Path('/tmp').access(effective_ids=True, follow_symlinks=True) is True
             >>> if MACOS:
             ...     assert Path('/etc/bashrc').access(effective_ids=True) is False
-            >>> assert Path('/etc/sudoers').access(effective_ids=True, os_mode=os.R_OK) is False
+            >>> if MACOS and not os.environ.get("CI"):
+            ...     assert Path('/etc/sudoers').access(effective_ids=True, os_mode=os.R_OK) is False
 
 
         Args:

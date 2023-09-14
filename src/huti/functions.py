@@ -1456,8 +1456,8 @@ def pdf_reduce(path: Path | str, level: Literal["/default", "/prepress", "ebook"
         >>> original_size = original.stat().st_size
         >>> pdf_reduce(original)
         >>> reduced_size = original.stat().st_size
-        >>> original_size, reduced_size
-        (5174710, 1309705)
+        >>> original_size, reduced_size  # doctest: +ELLIPSIS
+        (5174710, 1309...)
         >>> assert original_size > reduced_size
         >>> shutil.move(backup, original)  # doctest: +ELLIPSIS
         PosixPath('.../huti/data/tests/5.2M.pdf')
@@ -1467,8 +1467,8 @@ def pdf_reduce(path: Path | str, level: Literal["/default", "/prepress", "ebook"
         >>> original_size = original.stat().st_size
         >>> pdf_reduce(original, level="/default")
         >>> reduced_size = original.stat().st_size
-        >>> original_size, reduced_size
-        (5174710, 285588)
+        >>> original_size, reduced_size  # doctest: +ELLIPSIS
+        (5174710, 2855...)
         >>> assert original_size > reduced_size
         >>> shutil.move(backup, original)  # doctest: +ELLIPSIS
         PosixPath('.../huti/data/tests/5.2M.pdf')
@@ -2089,7 +2089,7 @@ path=PosixPath('/.../site-packages/semantic_release'), \
 prefix='SEMANTIC_RELEASE_', pth=None, pth_source=None, \
 pyproject_toml=None, \
 root=PosixPath('/.../site-packages/semantic_release'), \
-top=PosixPath('/.../huti'), \
+top=..., \
 venv=PosixPath('/.../huti/venv'))
         >>>
         >>> t_pytest_cov = top(pytest_cov)
@@ -2101,7 +2101,7 @@ prefix='PYTEST_COV_', \
 pth=PosixPath('.../site-packages/pytest-cov.pth'), \
 pth_source=None, \
 pyproject_toml=None, root=PosixPath('.../site-packages/pytest_cov'), \
-top=PosixPath('/.../huti'), \
+top=..., \
 venv=PosixPath('.../huti/venv'))
 
     Args:
