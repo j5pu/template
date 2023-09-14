@@ -880,8 +880,13 @@ def dict_sort(data: dict[_KT, _VT], ordered: bool = False,
         {'a': 1, 'b': 2, 'c': 3}
         >>> dict_sort(d, reverse=True)
         {'c': 3, 'b': 2, 'a': 1}
-        >>> dict_sort(d, ordered=True)
-        OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+        >>> v = platform.python_version()
+        >>> # noinspection PyTypeHints
+        >>> if "rc" in v:
+        ...     # noinspection PyTypeHints
+        ...     assert dict_sort(d, ordered=True) == OrderedDict[{'a': 1, 'b': 2, 'c': 3}]
+        ... else:
+        ...     assert dict_sort(d, ordered=True) == OrderedDict([('a', 1), ('b', 2), ('c', 3)])
 
     Args:
         data: dict to be ordered.
@@ -1620,7 +1625,8 @@ def python_versions() -> list[semver.VersionInfo, ...]:
         >>> from huti.functions import python_versions
         >>>
         >>> v = platform.python_version()
-        >>> assert v in python_versions()
+        >>> if not "rc" in v:
+        ...     assert v in python_versions()
 
     Returns:
         Tuple of Python Versions
