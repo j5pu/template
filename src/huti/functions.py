@@ -881,11 +881,8 @@ def dict_sort(data: dict[_KT, _VT], ordered: bool = False,
         >>> dict_sort(d, reverse=True)
         {'c': 3, 'b': 2, 'a': 1}
         >>> v = platform.python_version()
-        >>> # noinspection PyTypeHints
-        >>> if "rc" in v:
+        >>> if "rc" not in v:
         ...     # noinspection PyTypeHints
-        ...     assert dict_sort(d, ordered=True) == OrderedDict[{'a': 1, 'b': 2, 'c': 3}]
-        ... else:
         ...     assert dict_sort(d, ordered=True) == OrderedDict([('a', 1), ('b', 2), ('c', 3)])
 
     Args:
