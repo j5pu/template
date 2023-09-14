@@ -30,6 +30,7 @@ __all__ = (
 import asyncio
 import collections
 import contextlib
+import difflib
 import functools
 import getpass
 import grp
@@ -40,12 +41,15 @@ import os
 import pathlib
 import platform
 import pwd
+import random
 import re
 import shutil
 import subprocess
 import sys
 import sysconfig
 import tarfile
+import tempfile
+import time
 import types
 from pathlib import Path
 from typing import Any
@@ -55,6 +59,7 @@ from typing import cast
 from typing import Coroutine
 from typing import Generic
 from typing import Iterable
+from typing import Literal
 from typing import MutableMapping
 from typing import OrderedDict
 from typing import ParamSpec
@@ -76,7 +81,10 @@ from huti.classes import CmdError
 from huti.classes import FrameSimple
 from huti.classes import GroupUser
 from huti.classes import TempDir
+from huti.constants import HUTI_DATA_TESTS
+from huti.constants import PDF_REDUCE_THRESHOLD
 from huti.constants import PYTHON_FTP
+from huti.constants import SCAN_PREFIX
 from huti.constants import venv
 from huti.datas import Top
 from huti.enums import FileName
@@ -84,6 +92,7 @@ from huti.enums import PathIs
 from huti.enums import PathSuffix
 from huti.env import USER
 from huti.exceptions import InvalidArgument
+from huti.exceptions import CommandNotFound
 from huti.typings import AnyPath
 from huti.typings import ExcType
 from huti.typings import GitScheme
@@ -934,6 +943,19 @@ def effect(apply: Callable, *args: Iterable) -> None:
             apply(item)
 
 
+def exif_rm_tags(file: Path | str):
+    """Removes tags with exiftool in pdf"""
+    which("exiftool", raises=True)
+
+    subprocess.check_call([
+        "exiftool",
+        "-q", "-q",
+        "-all=",
+        "-overwrite_original",
+        file
+    ])
+
+
 def filterm(d: MutableMapping[_KT, _VT], k: Callable[..., bool] = lambda x: True,
             v: Callable[..., bool] = lambda x: True) -> MutableMapping[_KT, _VT]:
     """
@@ -1122,6 +1144,39 @@ def framesimple(data: inspect.FrameInfo | types.FrameType |types.TracebackType) 
                        path=sourcepath(data), vars=v)
 
 
+def from_latin9(*args) -> str:
+    """
+    Converts string from latin9 hex
+
+    Examples:
+        >>> from huti.functions import from_latin9
+        >>>
+        >>> from_latin9("f1")
+        'ñ'
+        >>>
+        >>> from_latin9("4a6f73e920416e746f6e696f205075e972746f6c6173204d6f6e7461f1e973")
+        'José Antonio Puértolas Montañés'
+        >>>
+        >>> from_latin9("f1", "6f")
+        'ño'
+
+    Args:
+        args:
+
+    Returns:
+        str
+    """
+    rv = ""
+    if len(args) == 1:
+        pairs = split_pairs(args[0])
+        for pair in pairs:
+            rv += bytes.fromhex("".join(pair)).decode("latin9")
+    else:
+        for char in args:
+            rv += bytes.fromhex(char).decode("latin9")
+    return rv
+
+
 def fromiter(data, *args):
     """
     Gets attributes from Iterable of objects and returns dict with
@@ -1143,7 +1198,6 @@ def fromiter(data, *args):
     """
     value = {k: [getattr(C, k) for C in data if hasattr(C, k)] for i in args for k in toiter(i)}
     return {k: v for k, v in value.items() if v}
-
 
 
 def getpths() -> dict[str, pathlib.Path] | None:
@@ -1330,6 +1384,147 @@ def parent(path: StrOrBytesPath = pathlib.Path(__file__), none: bool = True) -> 
         path := pathlib.Path(path)).is_file() else path if path.is_dir() else None if none else path.parent
 
 
+def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
+    """
+    Show diffs of two pdfs
+
+    Args:
+        file1:
+        file2:
+
+    Returns:
+        True if equals
+    """
+    return list(difflib.diff_bytes(difflib.unified_diff, Path(file1).read_bytes().splitlines(),
+                                   Path(file2).read_bytes().splitlines(), n=1))
+
+
+def pdf_linearize(file: Path | str):
+    """linearize pdf (overwrites original)"""
+    which("qpdf")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir) / "tmp.pdf"
+        subprocess.run([
+            "qpdf",
+            '--linearize',
+            file,
+            tmp
+        ])
+        Path(tmp).replace(file)
+
+
+def pdf_reduce(path: Path | str, level: Literal["/default", "/prepress", "ebook", "/screen"] = "/prepress",
+               threshold: int | None = PDF_REDUCE_THRESHOLD):
+    """
+    Compress pdf
+
+    https://www.adobe.com/acrobat/hub/how-to-compress-pdf-in-linux.html
+
+    Examples:
+        >>> import shutil
+        >>> from huti.constants import HUTI_DATA_TESTS
+        >>> from huti.functions import pdf_reduce
+        >>>
+        >>> original = HUTI_DATA_TESTS / "5.2M.pdf"
+        >>> backup = HUTI_DATA_TESTS / "5.2M-bk.pdf"
+        >>> shutil.copyfile(original, backup)  # doctest: +ELLIPSIS
+        PosixPath('.../huti/data/tests/5.2M-bk.pdf')
+        >>> original_size = original.stat().st_size
+        >>> pdf_reduce(original)
+        >>> reduced_size = original.stat().st_size
+        >>> original_size, reduced_size
+        (5174710, 1309705)
+        >>> assert original_size > reduced_size
+        >>> shutil.move(backup, original)  # doctest: +ELLIPSIS
+        PosixPath('.../huti/data/tests/5.2M.pdf')
+        >>>
+        >>> shutil.copyfile(original, backup)  # doctest: +ELLIPSIS
+        PosixPath('.../huti/data/tests/5.2M-bk.pdf')
+        >>> original_size = original.stat().st_size
+        >>> pdf_reduce(original, level="/default")
+        >>> reduced_size = original.stat().st_size
+        >>> original_size, reduced_size
+        (5174710, 285588)
+        >>> assert original_size > reduced_size
+        >>> shutil.move(backup, original)  # doctest: +ELLIPSIS
+        PosixPath('.../huti/data/tests/5.2M.pdf')
+
+    Args:
+        path:
+        threshold: limit in MB to reduce file size, None to reuce any pdf
+        level: /default is selected by the system, /prepress 300 dpi, ebook 150 dpi, screen 72 dpi
+
+    Returns:
+
+    """
+    if threshold is None or Path(path).stat().st_size > threshold:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir) / "tmp.pdf"
+            subprocess.check_call([
+                "gs",
+                "-sDEVICE=pdfwrite",
+                "-dCompatibilityLevel=1.4",
+                f"-dPDFSETTINGS={level}",
+                "-dNOPAUSE",
+                "-dQUIET",
+                "-dBATCH",
+                f"-sOutputFile={tmp}",
+                path
+            ])
+            Path(tmp).replace(path)
+
+
+def pdf_scan(file: Path, directory: Path = None) -> Path:
+    """
+    Looks like scanned, linearize and sets tag color
+
+    Examples:
+        >>> from pathlib import Path
+        >>> from huti.constants import HUTI_DATA
+        >>> from huti.constants import SCAN_PREFIX
+        >>> from huti.functions import pdf_scan
+        >>>
+        >>> for f in Path(HUTI_DATA_TESTS).iterdir():
+        ...     if f.is_file() and f.suffix == ".pdf":
+        ...         assert f"generated/{SCAN_PREFIX}" in str(pdf_scan(f, HUTI_DATA_TESTS / "generated"))
+
+    Args:
+        file: path of file to be scanned
+        directory: destination directory (Default: file directory)
+
+    Returns:
+        Destination file
+    """
+    rotate = round(random.uniform(*random.choice([(-0.9, -0.5), (0.5, 0.9)])), 2)
+
+    file = Path(file)
+    filename = f"{SCAN_PREFIX}{file.stem}{file.suffix}"
+    directory = Path(directory)
+    if directory:
+        if not directory.is_dir():
+            directory.mkdir(parents=True, exist_ok=True)
+        dest = directory / filename
+    else:
+        dest = file.with_name(filename)
+
+    which("convert", raises=True)
+
+    subprocess.check_call([
+        "convert",
+        "-density", "120",
+        file,
+        "-attenuate", "0.4",
+        "+noise", "Gaussian",
+        "-rotate", str(rotate),
+        "-attenuate", "0.03",
+        "+noise", "Uniform",
+        "-sharpen", "0x1.0",
+        dest
+    ])
+    return dest
+
+
 def python_latest(start: str | int | None = None) -> semver.VersionInfo:
     """
     Python latest version avaialble
@@ -1413,6 +1608,32 @@ def python_versions() -> list[semver.VersionInfo, ...]:
     return sorted(rv)
 
 
+
+def request_x_api_key_json(url, key: str = "") -> dict[str, str] | None:
+    """
+    API request helper with API Key and returning json
+
+    Examples:
+        >>> from huti.functions import request_x_api_key_json
+        >>>
+        >>> request_x_api_key_json("https://api.iplocation.net/?ip=8.8.8.8", \
+                "rn5ya4fp/tzI/mENxaAvxcMo8GMqmg7eMnCvUFLIV/s=")
+        {'ip': '8.8.8.8', 'ip_number': '134744072', 'ip_version': 4, 'country_name': 'United States of America',\
+ 'country_code2': 'US', 'isp': 'Google LLC', 'response_code': '200', 'response_message': 'OK'}
+
+    Args:
+        url: API url
+        key: API Key
+
+    Returns:
+        response json
+    """
+    headers = {"headers": {'X-Api-Key': key}} if key else {}
+    response = requests.get(url, **headers)
+    if response.status_code == requests.codes.ok:
+        return response.json()
+
+
 def sourcepath(data: Any) -> Path:
     """
     Get path of object.
@@ -1441,6 +1662,25 @@ def sourcepath(data: Any) -> Path:
         except TypeError:
             f = None
     return Path(f or str(data))
+
+
+def split_pairs(text):
+    """
+    Split text in pairs for even length
+
+    Examples:
+        >>> from huti.functions import split_pairs
+        >>>
+        >>> split_pairs("123456")
+        [('1', '2'), ('3', '4'), ('5', '6')]
+
+    Args:
+        text:
+
+    Returns:
+
+    """
+    return list(zip(text[0::2], text[1::2]))
 
 
 def stdout(shell: AnyStr, keepends: bool = False, split: bool = False) -> list[str] | str | None:
@@ -1695,6 +1935,12 @@ def tilde(path: str | Path = '.') -> str:
     return str(path).replace(str(Path.home()), '~')
 
 
+def timestamp_now(file: Path | str):
+    """set modified and create date of file to now"""
+    now = time.time()
+    os.utime(file, (now, now))
+
+
 def toiter(obj: Any, always: bool = False, split: str = " ") -> Any:
     """
     To iter.
@@ -1726,6 +1972,32 @@ def toiter(obj: Any, always: bool = False, split: str = " ") -> Any:
     elif not isinstance(obj, Iterable) or always:
         obj = [obj]
     return obj
+
+
+def to_latin9(chars: str) -> str:
+    """
+    Converts string to latin9 hex
+
+    Examples:
+        >>> from huti.constants import JOSE
+        >>> from huti.functions import to_latin9
+        >>>
+        >>> to_latin9("ñ")
+        'f1'
+        >>>
+        >>> to_latin9(JOSE)
+        '4a6f73e920416e746f6e696f205075e972746f6c6173204d6f6e7461f1e973'
+
+    Args:
+        chars:
+
+    Returns:
+        hex str
+    """
+    rv = ""
+    for char in chars:
+        rv += char.encode("latin9").hex()
+    return rv
 
 
 def tomodules(obj: Any, suffix: bool = True) -> str:
@@ -1933,7 +2205,7 @@ def version(data: types.ModuleType | pathlib.Path | str | None = None) -> str:
                     exception=importlib.metadata.PackageNotFoundError)
 
 
-def which(data="sudo"):
+def which(data="sudo", raises: bool = False) -> str:
     """
     Checks if cmd or path is executable or exported bash function.
 
@@ -1945,16 +2217,25 @@ def which(data="sudo"):
         >>> assert which('/usr/bin/python3') == '/usr/bin/python3'
         >>> assert which('let') == 'let'
         >>> assert which('source') == 'source'
+        >>> which("foo", raises=True) # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        huti.exceptions.CommandNotFound: foo
 
     Attribute:
         data: command or path.
+        raises: raise exception if command not found
+
+    Raises:
+        CommandNotFound:
+
 
     Returns:
-        Cmd path.
+        Cmd path or ""
     """
-    key = Path(data).name
-    if key not in _cache_which:
-        value = shutil.which(data, mode=os.X_OK) or subprocess.run(
-            f'command -v {data}', shell=True, text=True, capture_output=True).stdout.rstrip('\n') or ''
-        _cache_which[key] = value
-    return _cache_which[key]
+    rv = shutil.which(data, mode=os.X_OK) or subprocess.run(
+        f'command -v {data}', shell=True, text=True, capture_output=True).stdout.rstrip('\n') or ''
+
+    if raises and not rv:
+        raise CommandNotFound(data)
+
+    return rv

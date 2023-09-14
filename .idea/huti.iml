@@ -20,6 +20,7 @@
     <orderEntry type="module" module-name="upins" />
     <orderEntry type="module" module-name="prel" />
     <orderEntry type="module" module-name="turbogit" />
+    <orderEntry type="module" module-name="bbin" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />

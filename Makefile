@@ -1,11 +1,14 @@
 .PHONY: clean publish tests version
 
-msg := rm if empty path
+msg := fix: $(shell git status --porcelain | grep -v "^??" | cut -c4- | tr '\n' ' ')
 SHELL := $(shell bash -c 'command -v bash')
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 PYTHONPATH := $(ROOT_DIR)/src
 export msg
 export PYTHONPATH
+
+brew:
+	@brew bundle --file=src/huti/data/Brewfile --no-lock --quiet
 
 build: clean
 	@source venv/bin/activate && python3 -m build --wheel
@@ -16,8 +19,8 @@ clean:
 
 commit: tests tox
 	@git add .
-	@git commit --quiet -a -m "$${msg:-fix}" || true
-	@git push --quiet
+	@git commit --quiet -a -m "$${msg:-fix:}" || true
+	@git push --quiet --tags
 
 coverage:
 	@source venv/bin/activate && coverage run -m pytest && coverage report

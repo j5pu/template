@@ -1,0 +1,3 @@
+brew "exiftool"
+brew "imagemagick"
+brew "qpdf"

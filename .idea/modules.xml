@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../Archive/bapy/.idea/bapy.iml" filepath="$PROJECT_DIR$/../Archive/bapy/.idea/bapy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Archive/bbin/.idea/bbin.iml" filepath="$PROJECT_DIR$/../Archive/bbin/.idea/bbin.iml" />
       <module fileurl="file://$PROJECT_DIR$/../gitp/.idea/gitp.iml" filepath="$PROJECT_DIR$/../gitp/.idea/gitp.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/huti.iml" filepath="$PROJECT_DIR$/.idea/huti.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/data/prel/.idea/prel.iml" filepath="$PROJECT_DIR$/../Archive/data/prel/.idea/prel.iml" />
