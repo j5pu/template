@@ -43,6 +43,7 @@ jobs:
         run: |
           make brew
           python -m pip install .[tests]
+          python -m pip install build
 #          make requirements
 
       - name: pytest
