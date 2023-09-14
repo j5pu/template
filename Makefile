@@ -15,7 +15,7 @@ build: clean
 
 clean:
 	@rm -rf build dist **/*.egg-info *.egg-info .mypy_cache .pytest_cache .tox **/scanned_*.pdf **/generated_*.pdf \
-		src/pdf/data/Reembolsos
+		src/pdf/data/Reembolsos ./huti-*
 
 commit: tests tox
 	@git add .

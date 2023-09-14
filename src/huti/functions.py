@@ -2090,7 +2090,7 @@ prefix='SEMANTIC_RELEASE_', pth=None, pth_source=None, \
 pyproject_toml=None, \
 root=PosixPath('/.../site-packages/semantic_release'), \
 top=..., \
-venv=...))
+venv=...)
         >>>
         >>> t_pytest_cov = top(pytest_cov)
         >>> t_pytest_cov  # doctest: +ELLIPSIS
