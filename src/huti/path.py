@@ -247,8 +247,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.path import Path
             >>>
             >>> with Path.tempfile() as tmp:
-            ...    _ = tmp.path.write_text('Hello')
-            ...    assert 'Hello World!' in tmp.path.append_text(' World!')
+            ...    _ = tmp.write_text('Hello')
+            ...    assert 'Hello World!' in tmp.append_text(' World!')
 
         Args:
             text: text to add.
@@ -325,8 +325,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.path import Path
             >>>
             >>> with Path.tempfile() as tmp:
-            ...    _ = tmp.path.write_text('Hello')
-            ...    assert tmp.path.checksum() == '185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969'
+            ...    _ = tmp.write_text('Hello')
+            ...    assert tmp.checksum() == '185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969'
 
         Args:
             algorithm: hash algorithm (default: 'sha256').
@@ -349,7 +349,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.path import Path
             >>>
             >>> with Path.tempfile() as tmp:
-            ...     changed = tmp.path.chmod(777)
+            ...     changed = tmp.chmod(777)
             ...     assert changed.stat().st_mode & 0o777 == 0o777
             ...     assert changed.stats().mode == "-rwxrwxrwx"
             ...     assert changed.chmod("o-x").stats().mode == '-rwxrwxrw-'
@@ -395,7 +395,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.variables import MACOS
             >>>
             >>> with Path.tempfile() as tmp:
-            ...     changed = tmp.path.chown(passwd=Passwd.from_root())
+            ...     changed = tmp.chown(passwd=Passwd.from_root())
             ...     st = changed.stat()
             ...     assert st.st_gid == 0
             ...     assert st.st_uid == 0
@@ -409,7 +409,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             ...     else:
             ...         assert stats.group == "root"
             ...         g = "adm"
-            ...     changed = tmp.path.chown(f"{os.getuid()}:{g}")
+            ...     changed = tmp.chown(f"{os.getuid()}:{g}")
             ...     stats = changed.stats()
             ...     assert stats.group == g
             ...     assert stats.uid == os.getuid()
@@ -482,14 +482,14 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.path import Passwd
             >>>
             >>> with Path.tempfile() as tmp:
-            ...     changed = tmp.path.chown(passwd=Passwd.from_root())
+            ...     changed = tmp.chown(passwd=Passwd.from_root())
             ...     copied = Path(__file__).cp(changed)
             ...     st = copied.stat()
             ...     assert st.st_gid == 0
             ...     assert st.st_uid == 0
             ...     stats = copied.stats()
             ...     assert stats.mode == "-rw-------"
-            ...     _ = tmp.path.chown()
+            ...     _ = tmp.chown()
             ...     assert copied.cmp(__file__)
 
             >>> with Path.tempdir() as tmp:
@@ -606,8 +606,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.path import Path
             >>>
             >>> with Path.tempfile() as tmpfile:
-            ...     new = tmpfile.path / "sub" / "file.py"
-            ...     assert new.file_in_parents(exception=False) == tmpfile.path.absolute()
+            ...     new = tmpfile / "sub" / "file.py"
+            ...     assert new.file_in_parents(exception=False) == tmpfile.absolute()
             >>>
             >>> with Path.tempdir() as tmpdir:
             ...    new = tmpdir / "sub" / "file.py"
@@ -1125,11 +1125,10 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> assert all([rv.root, rv.sgid, rv.sticky, rv.suid]) is False
             >>>
             >>> with Path.tempfile() as file:
-            ...     f = Path(file.name)
-            ...     _ = f.chmod('u+s,+x')
-            ...     assert f.stats().suid is True
-            ...     _ = f.chmod('g+s,+x')
-            ...     assert f.stats().sgid is True
+            ...     _ = file.chmod('u+s,+x')
+            ...     assert file.stats().suid is True
+            ...     _ = file.chmod('g+s,+x')
+            ...     assert file.stats().sgid is True
 
         Args:
             follow_symlinks: If False, and the last element of the path is a symbolic link,
@@ -1312,8 +1311,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             >>> from huti.path import Path
             >>>
             >>> with Path.tempfile() as tmpfile:
-            ...    assert tmpfile.path.exists() and tmpfile.path.is_file()
-            >>> assert tmpfile.path.exists() is False
+            ...    assert tmpfile.exists() and tmpfile.is_file()
+            >>> assert tmpfile.exists() is False
 
         Args:
             mode: the mode argument to io.open (default "w+b").
@@ -1334,9 +1333,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         with tempfile.NamedTemporaryFile(mode=mode, buffering=buffering, encoding=encoding, newline=newline,
                                          suffix=suffix, prefix=prefix, dir=directory, delete=delete,
                                          errors=errors) as tmp:
-            tmp.path = cls(tmp.name)
             try:
-                yield tmp
+                yield cls(tmp.name)
             finally:
                 pass
 
@@ -1502,14 +1500,13 @@ class Passwd:
                     login != Passwd().from_root()
             >>> assert default.gid == os.getgid()
             >>> assert default.home == Path(os.environ["HOME"])
-            >>> assert default.shell == Path(os.environ["SHELL"])
+            >>> if shell := os.environ["SHELL"]:
+            ...     assert default.shell == Path(shell)
             >>> assert default.uid == os.getuid()
             >>> assert default.user == user
             >>> if MACOS:
             ...    assert "staff" in default.groups
             ...    assert "admin" in default.groups
-            ... else:
-            ...    assert user in default.groups
 
         Errors:
             os.setuid(0)

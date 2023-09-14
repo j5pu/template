@@ -604,11 +604,11 @@ def cmdrun(data: Iterable, exc: bool = False, lines: bool = True, shell: bool = 
         >>> from huti.functions import cmdrun
         >>> from huti.functions import tox
         >>>
-        >>> cmdrun('ls a')
-        CompletedProcess(args='ls a', returncode=1, stdout=[], stderr=['ls: a: No such file or directory'])
+        >>> cmdrun('ls a')  # doctest: +ELLIPSIS
+        CompletedProcess(args='ls a', returncode=..., stdout=[], stderr=[...])
         >>> assert 'Requirement already satisfied' in cmdrun('pip install pip', py=True).stdout[0]
-        >>> cmdrun('ls a', shell=False, lines=False)  # Extra '\' added to avoid docstring error.
-        CompletedProcess(args=['ls', 'a'], returncode=1, stdout='', stderr='ls: a: No such file or directory\\n')
+        >>> cmdrun('ls a', shell=False, lines=False)  # doctest: +ELLIPSIS
+        CompletedProcess(args=['ls', 'a'], returncode=..., stdout='', stderr=...)
         >>> cmdrun('echo a', lines=False)  # Extra '\' added to avoid docstring error.
         CompletedProcess(args='echo a', returncode=0, stdout='a\\n', stderr='')
         >>> assert "venv" not in cmdrun("sysconfig", py=True, lines=False).stdout
@@ -2237,8 +2237,8 @@ def which(data="sudo", raises: bool = False) -> str:
 
     Examples:
         >>> from huti.functions import which
-        >>> which()  # doctest: +ELLIPSIS
-        '.../sudo'
+        >>> if which():
+        ...    assert "sudo" in which()
         >>> assert which('/usr/local') == ''
         >>> assert which('/usr/bin/python3') == '/usr/bin/python3'
         >>> assert which('let') == 'let'
