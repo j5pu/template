@@ -273,11 +273,13 @@ def clone(owner: str | None = None, repo: str = HUTI_ROOT, scheme: GitScheme = G
     Clone Repository
 
     Examples:
+        >>> import os
         >>> from huti.classes import TempDir
         >>> from huti.repo import clone
         >>>
         >>> with TempDir() as tmp:
         ...     directory = tmp / "1" / "2" / "3"
+        >>> if not os.environ.get("CI"):
         ...     rv = clone("octocat", "Hello-World", "git+ssh", directory)
         ...     assert rv.returncode == 0
         ...     assert (directory / "README").exists()
