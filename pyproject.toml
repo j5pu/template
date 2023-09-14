@@ -68,8 +68,10 @@ tests = [
 where = ["src"]  # ["."] by default
 
 [build-system]
-requires = ['setuptools', 'wheel']
+requires = ['setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
+
+[tool.setuptools_scm]
 
 [tool.semantic_release]
 build_command = "python -m build --wheel"
