@@ -13,6 +13,7 @@ __all__ = (
     "EXECUTABLE",
     "EXECUTABLE_SITE",
     "HUTI_SOURCES",
+    "HUTI_PROJECT",
     "HUTI_ROOT",
     "PW_ROOT",
     "PW_USER",
@@ -38,9 +39,10 @@ BUILTIN_MODULE_NAMES = sys.builtin_module_names
 CONSOLE = rich.console.Console(force_interactive=True, color_system='256')
 EXECUTABLE = Path(sys.executable)
 EXECUTABLE_SITE = Path(EXECUTABLE).resolve()
-
 HUTI_SOURCES = Path(__file__).parent
 """Huti sources directory"""
+HUTI_PROJECT = HUTI_SOURCES.name
+"""Huti project name"""
 HUTI_ROOT = HUTI_SOURCES.parent.parent
 """Huti Repository Path"""
 LINUX = sys.platform == "linux"

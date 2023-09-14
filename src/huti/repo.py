@@ -22,6 +22,7 @@ from huti.functions import cmd
 from huti.path import Path
 from huti.path import AnyPath
 from huti.typings import GitScheme
+from huti.variables import HUTI_PROJECT
 from huti.variables import HUTI_ROOT
 
 __all__ = (
@@ -73,7 +74,7 @@ class OwnerRepo:
     :param url: furl instance of GitHub URL
     """
     owner: str = field(default=GIT)
-    repo: str = field(default=HUTI_ROOT.name)
+    repo: str = field(default=HUTI_PROJECT)
     scheme: str = field(default=GIT_DEFAULT_SCHEME)
     url: furl | ParseResult | Path | str = field(default=None)
 
@@ -236,6 +237,7 @@ async def aioclone(owner: str | None = None, repo: str = HUTI_ROOT, scheme: GitS
 
     Examples:
         >>> import asyncio
+        >>> from huti.repo import aioclone
         >>> from huti.classes import TempDir
         >>>
         >>> with TempDir() as tmp:
@@ -268,6 +270,7 @@ def clone(owner: str | None = None, repo: str = HUTI_ROOT, scheme: GitScheme = G
 
     Examples:
         >>> from huti.classes import TempDir
+        >>> from huti.repo import clone
         >>>
         >>> with TempDir() as tmp:
         ...     directory = tmp / "1" / "2" / "3"

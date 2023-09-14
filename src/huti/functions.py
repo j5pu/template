@@ -81,6 +81,7 @@ from huti.classes import CmdError
 from huti.classes import FrameSimple
 from huti.classes import GroupUser
 from huti.classes import TempDir
+from huti.constants import HUTI_DATA
 from huti.constants import HUTI_DATA_TESTS
 from huti.constants import PDF_REDUCE_THRESHOLD
 from huti.constants import PYTHON_FTP
@@ -95,11 +96,9 @@ from huti.exceptions import InvalidArgument
 from huti.exceptions import CommandNotFound
 from huti.typings import AnyPath
 from huti.typings import ExcType
-from huti.typings import GitScheme
 from huti.typings import StrOrBytesPath
 from huti.variables import EXECUTABLE
 from huti.variables import EXECUTABLE_SITE
-from huti.variables import HUTI_ROOT
 from huti.variables import PW_ROOT
 from huti.variables import PW_USER
 
@@ -342,6 +341,30 @@ def anyin(origin: Iterable, destination: Iterable) -> Any | None:
     for item in toiter(origin):
         if item in destination:
             return item
+
+
+def brew_bundle(brewfile: Path | str = HUTI_DATA / 'Brewfile', c: str = None) -> int:
+    """
+    Installs brewfile under data directory
+
+    Examples:
+        >>> from huti.functions import brew_bundle
+        >>> assert brew_bundle() == 0
+        >>> assert brew_bundle(c="convert") is None
+
+    Args:
+        brewfile: brewfile to install
+        c: command that needs to be absent to run brew bundle
+    """
+
+    if which("brew") and brewfile.exists() and (c is None or not which(c)):
+        return subprocess.check_call([
+            "brew",
+            "bundle",
+            "--no-lock",
+            "--quiet",
+            f"--file={brewfile}",
+        ])
 
 
 class _CacheWrapper(Generic[_T]):
@@ -1095,7 +1118,7 @@ def flatten(data: tuple | list | set, recurse: bool = False, unique: bool = Fals
     return value
 
 
-def framesimple(data: inspect.FrameInfo | types.FrameType |types.TracebackType) -> FrameSimple | None:
+def framesimple(data: inspect.FrameInfo | types.FrameType | types.TracebackType) -> FrameSimple | None:
     """
     :class:`rc.FrameSimple`.
 
@@ -1606,7 +1629,6 @@ def python_versions() -> list[semver.VersionInfo, ...]:
         if link := re.match(r'((3\.([7-9]|[1-9][0-9]))|4).*', link.get('href').rstrip('/')):
             rv.append(semver.VersionInfo.parse(link.string))
     return sorted(rv)
-
 
 
 def request_x_api_key_json(url, key: str = "") -> dict[str, str] | None:
