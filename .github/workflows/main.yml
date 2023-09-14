@@ -39,12 +39,9 @@ jobs:
       - name: Install dependencies
         run: |
           make brew
-          python -m pip install install --upgrade pip pip-tools
-          pip-compile --all-extras --no-annotate --quiet -o /tmp/requirements.txt pyproject.toml
-          python -m pip install -r /tmp/requirements.txt
-          python -m pip install pytest-github-actions-annotate-failures
+          make requirements
       - name: pytest
-        run: PYTHONHASHSEED=123345 python -m pytest
+        run: PYTHONHASHSEED=123345 make tests
 
   #  mypy:
   #    runs-on: ubuntu-latest

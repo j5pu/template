@@ -11,7 +11,7 @@ brew:
 	@brew bundle --file=src/huti/data/Brewfile --no-lock --quiet
 
 build: clean
-	@source venv/bin/activate && python3 -m build --wheel
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m build --wheel
 
 clean:
 	@rm -rf build dist **/*.egg-info *.egg-info .mypy_cache .pytest_cache .tox **/scanned_*.pdf **/generated_*.pdf \
@@ -23,25 +23,25 @@ commit: tests tox
 	@git push --quiet --tags
 
 coverage:
-	@source venv/bin/activate && coverage run -m pytest && coverage report
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && coverage run -m pytest && coverage report
 
 
 publish: commit
-	@source venv/bin/activate && twine upload -u __token__ dist/*
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && twine upload -u __token__ dist/*
 	@make clean
 
 
 requirements:
-	@test -d venv || python3.11 -m venv venv
-	@source venv/bin/activate && pip3 install --upgrade pip pip-tools && \
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && test -d venv || python3.11 -m venv venv
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m pip install --upgrade pip pip-tools && \
 		pip-compile --all-extras --no-annotate --quiet -o /tmp/requirements.txt pyproject.toml && \
-		pip3 install -r /tmp/requirements.txt
+		python3 -m pip  install -r /tmp/requirements.txt
 
-tests: clean build
-	@source venv/bin/activate && pytest
+tests: build
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && pytest
 
 tox:
-	@eval "$$(pyenv init --path)"; source venv/bin/activate && PY_IGNORE_IMPORTMISMATCH=1 tox
+	@eval "$$(pyenv init --path)";{  [ "$${CI-}" ] || source venv/bin/activate; } && PY_IGNORE_IMPORTMISMATCH=1 tox
 
 pyenv:
 	@pyenv install 3.10
