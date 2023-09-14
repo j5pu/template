@@ -42,9 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           make brew
-          python -m pip install .[tests]
-          python -m pip install build
-#          make requirements
+          make requirements
 
       - name: pytest
         run: PYTHONHASHSEED=123345 make tests
