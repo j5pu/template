@@ -1557,9 +1557,10 @@ def python_latest(start: str | int | None = None) -> semver.VersionInfo:
         >>> from huti.functions import python_latest
         >>>
         >>> v = platform.python_version()
-        >>> assert python_latest(v).match(f">={v}")
-        >>> assert python_latest(v.rpartition(".")[0]).match(f">={v}")
-        >>> assert python_latest(sys.version_info.major).match(f">={v}")
+        >>> if "rc" not in v:
+        ...     assert python_latest(v).match(f">={v}")
+        ...     assert python_latest(v.rpartition(".")[0]).match(f">={v}")
+        ...     assert python_latest(sys.version_info.major).match(f">={v}")
         >>>
         >>> assert python_latest("3.12").minor == 12
 

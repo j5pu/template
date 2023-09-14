@@ -96,7 +96,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
 
     def __eq__(self, other):
         """
-        Equal based on _cparts
+        Equal based on parts
 
         Examples:
             >>> from huti.path import Path
@@ -105,10 +105,10 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         """
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return tuple(self._cparts) == tuple(other._cparts)
+        return tuple(self.parts) == tuple(other.parts)
 
     def __hash__(self):
-        return self._hash if hasattr(self, '_hash') else hash(tuple(self._cparts))
+        return self._hash if hasattr(self, '_hash') else hash(tuple(self.parts))
 
     def __iter__(self):
         """
@@ -127,22 +127,22 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self._cparts < other._cparts
+        return self.parts < other.parts
 
     def __le__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self._cparts <= other._cparts
+        return self.parts <= other.parts
 
     def __gt__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self._cparts > other._cparts
+        return self.parts > other.parts
 
     def __ge__(self, other):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self._cparts >= other._cparts
+        return self.parts >= other.parts
 
     def access(self, os_mode=os.W_OK, *, dir_fd=None, effective_ids=False, follow_symlinks=False):
         # noinspection LongLine
@@ -821,7 +821,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         Returns:
             None.
         """
-        subprocess.run([*self.__class__(dest).sudo(to_list=True), f'{self.mv.__name__}', self, dest], check=True,
+        subprocess.run([*self.__class__(dest).sudo(), f'{self.mv.__name__}', self, dest], check=True,
                        capture_output=True)
         return dest
 
@@ -1498,7 +1498,8 @@ class Passwd:
             >>> user = os.environ["USER"]
             >>> login = Passwd.from_login()
             >>>
-            >>> assert default == Passwd(Path()) == Passwd(pathlib.Path())  == Passwd(user) == Passwd(os.getuid()) == login != Passwd().from_root()
+            >>> assert default == Passwd(Path()) == Passwd(pathlib.Path())  == Passwd(user) == Passwd(os.getuid()) == \
+                    login != Passwd().from_root()
             >>> assert default.gid == os.getgid()
             >>> assert default.home == Path(os.environ["HOME"])
             >>> assert default.shell == Path(os.environ["SHELL"])
@@ -1604,4 +1605,3 @@ Args:
     user: file user name
 """
 AnyPath: TypeAlias = Path | AnyPath
-
