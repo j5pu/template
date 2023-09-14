@@ -478,6 +478,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         Wrapper for shell `cp` command to copy file recursivily and adding sudo if necessary.
 
         Examples:
+            # FIXME: Ubuntu
             >>> from huti.path import Path
             >>> from huti.path import Passwd
             >>>
@@ -1500,7 +1501,7 @@ class Passwd:
                     login != Passwd().from_root()
             >>> assert default.gid == os.getgid()
             >>> assert default.home == Path(os.environ["HOME"])
-            >>> if shell := os.environ["SHELL"]:
+            >>> if shell := os.environ.get("SHELL"):
             ...     assert default.shell == Path(shell)
             >>> assert default.uid == os.getuid()
             >>> assert default.user == user

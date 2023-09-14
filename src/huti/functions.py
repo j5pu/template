@@ -514,6 +514,7 @@ def chdir(data: StrOrBytesPath | bool = True) -> Iterable[tuple[pathlib.Path, pa
     Change directory and come back to previous directory.
 
     Examples:
+        # FIXME: Ubuntu
         >>> from pathlib import Path
         >>> from huti.functions import chdir
         >>> from huti.variables import MACOS
@@ -2236,6 +2237,8 @@ def which(data="sudo", raises: bool = False) -> str:
     Checks if cmd or path is executable or exported bash function.
 
     Examples:
+        # FIXME: Ubuntu
+
         >>> from huti.functions import which
         >>> if which():
         ...    assert "sudo" in which()
