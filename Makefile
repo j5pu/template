@@ -47,3 +47,8 @@ pyenv:
 	@pyenv install 3.10
 	@pyenv install 3.11
 	@pyenv install 3.12-dev
+
+secrets:
+	@gh secret set GH_TOKEN --body "$$GITHUB_TOKEN"
+	@grep -v GITHUB_ /Users/j5pu/secrets/profile.d/secrets.sh > /tmp/secrets
+	@gh secret set -f  /tmp/secrets
