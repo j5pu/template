@@ -20,13 +20,18 @@ clean:
 commit: tests tox
 	@git add .
 	@git commit --quiet -a -m "$${msg:-fix:}" || true
-	@git push --quiet --tags
 
 coverage:
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && coverage run -m pytest && coverage report
 
 
 publish: commit
+	@NEXT=$$(svu next --strip-prefix) && \
+		CURRENT=$$(svu --strip-prefix) && \
+		[ $$NEXT != $$CURRENT ] && \
+		git tag $$NEXT && \
+		git push --quiet --tags
+	@make build
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && twine upload -u __token__ dist/*
 	@make clean
 

@@ -2195,8 +2195,10 @@ def version(data: types.ModuleType | pathlib.Path | str | None = None) -> str:
         >>> import IPython
         >>> import semver
         >>> import huti
+        >>> from huti.functions import version
         >>>
-        >>> assert semver.VersionInfo.parse(version(huti))
+        >>> if (v := version(huti)) and "dev" not in v:
+        ...     assert semver.VersionInfo.parse(version(huti))
         >>> assert semver.VersionInfo.parse(version(IPython))  # __version__
         >>> assert version(semver) == version(semver.__file__) == version(pathlib.Path(semver.__file__).parent) \
             == version("semver")
