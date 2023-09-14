@@ -28,7 +28,8 @@ coverage:
 publish: commit
 	@NEXT=$$(svu next --strip-prefix) && \
 		CURRENT=$$(svu --strip-prefix) && \
-		[ $$NEXT != $$CURRENT ] && \
+		[ $$NEXT != $$CURRENT ] &&
+		echo $$CURRENT $$NEXT \
 		git tag $$NEXT && \
 		git push --quiet --tags
 	@make build
@@ -46,7 +47,8 @@ tests: build
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && pytest
 
 tox:
-	@eval "$$(pyenv init --path)";{  [ "$${CI-}" ] || source venv/bin/activate; } && PY_IGNORE_IMPORTMISMATCH=1 tox
+	@eval "$$(pyenv init --path)";{  [ "$${CI-}" ] || source venv/bin/activate; } && \
+		PY_IGNORE_IMPORTMISMATCH=1 tox -p auto
 
 pyenv:
 	@pyenv install 3.10
