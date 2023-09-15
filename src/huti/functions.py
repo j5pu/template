@@ -1526,8 +1526,8 @@ def pdf_scan(file: Path, directory: Path = None) -> Path:
 
     file = Path(file)
     filename = f"{SCAN_PREFIX}{file.stem}{file.suffix}"
-    directory = Path(directory)
     if directory:
+        directory = Path(directory)
         if not directory.is_dir():
             directory.mkdir(parents=True, exist_ok=True)
         dest = directory / filename
