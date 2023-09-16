@@ -69,5 +69,13 @@ FrameSimple = NamedTuple('FrameSimple', back=FrameType, code=CodeType,
 
 GroupUser = NamedTuple('GroupUser', group=int | str, user=int | str)
 
+class LetterCounter:
+    current_value: list[int]
+
+    def __init__(self, start: str = ...): ...
+
+    def increment(self) -> str: ...
+
+
 class TempDir(tempfile.TemporaryDirectory):
     def __enter__(self) -> Path: ...

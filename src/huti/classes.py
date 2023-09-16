@@ -7,12 +7,14 @@ __all__ = (
     "CmdError",
     "FileConfig",
     "GroupUser",
+    "LetterCounter",
     "TempDir",
 )
 
 import collections
 import pathlib
 import signal
+import string
 import subprocess
 import tempfile
 from typing import AnyStr
@@ -356,6 +358,55 @@ FrameSimple = collections.namedtuple('FrameSimple', 'back code frame function gl
                                                     'package path vars')
 
 GroupUser = collections.namedtuple('GroupUser', 'group user')
+
+
+class LetterCounter:
+    """
+    Letter Counter generator function. This way, each time you call next() on the generator,
+
+    it will yield the next counter value. We will also remove the maximum counter check
+
+
+    Examples:
+        >>> from huti.classes import LetterCounter
+        >>>
+        >>> c = LetterCounter("Z")
+        >>> assert c.increment() == 'AA'
+
+    """
+    def __init__(self, start='A'):
+        self.current_value = [string.ascii_uppercase.index(v) for v in start[::-1]]
+
+    def increment(self):
+        """
+        Increments  1
+
+        Exaamples:
+            >>> from huti.classes import LetterCounter
+            >>>
+            >>> c = LetterCounter('BWDLQZZ')
+            >>> assert c.increment() == 'BWDLRAA'
+            >>> assert c.increment() == 'BWDLRAB'
+
+        Returns:
+
+        """
+        for i in range(0, len(self.current_value)):
+            # If digit is less than Z, increment and finish
+            if self.current_value[i] < 25:
+                self.current_value[i] += 1
+                break
+            # Otherwise, set digit to A (0) and continue to next digit
+            else:
+                self.current_value[i] = 0
+                # If we've just set the most significant digit to A,
+                # we need to add another 'A' at the most significant end
+                if i == len(self.current_value) - 1:
+                    self.current_value.append(0)
+                    break
+        # Form the string and return
+        return ''.join(reversed([string.ascii_uppercase[i] for i in self.current_value]))
+
 
 class TempDir(tempfile.TemporaryDirectory):
     """
