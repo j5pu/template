@@ -1426,13 +1426,23 @@ def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
                                    Path(file2).read_bytes().splitlines(), n=1))
 
 
-def pdf_from_jpeg(file: Path | str, picture: Path | str):
-    """Creates pdf from image"""
+def pdf_from_jpeg(file: Path | str, picture: Path | str, rm: bool = True) -> Path:
+    """
+    Creates pdf from image
+
+    Args:
+        file: pdf file
+        picture: image file
+        rm: remove image file (default: True)
+    """
     doc = fitz.Document()
     doc.new_page()
     page = doc[0]
     page.insert_image(page.rect, filename=picture)
     doc.save(Path(file))
+    if rm:
+        Path(picture).unlink()
+    return file
 
 
 def pdf_linearize(file: Path | str):
@@ -1550,7 +1560,7 @@ def pdf_scan(file: Path, directory: Path = None) -> Path:
 
 
 def pdf_to_jpeg(file: Path | str, dpi: int = 300) -> Path:
-    """Creates a temp file with jpeg from first page of pdf"""
+    """Creates a file with jpeg in the same directory from first page of pdf"""
     which("pdftoppm")
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -1566,7 +1576,7 @@ def pdf_to_jpeg(file: Path | str, dpi: int = 300) -> Path:
         ])
         if not (dest := Path(tmp).with_suffix(".jpg")).exists():
             raise FileNotFoundError(f"File not found {dest}")
-        return dest
+        return shutil.copy(dest, file.with_suffix(".jpg"))
 
 
 def python_latest(start: str | int | None = None) -> semver.VersionInfo:
