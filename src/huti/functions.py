@@ -1561,8 +1561,8 @@ def pdf_scan(file: Path, directory: Path = None) -> Path:
     return dest
 
 
-def pdf_to_jpeg(file: Path | str, dpi: int = 300):
-    """Converts first page of pdf to jpeg (overwrites original)"""
+def pdf_to_jpeg(file: Path | str, dpi: int = 300) -> Path:
+    """Creates a temp file with jpeg from first page of pdf"""
     which("pdftoppm")
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -1576,7 +1576,9 @@ def pdf_to_jpeg(file: Path | str, dpi: int = 300):
             file,
             tmp
         ])
-        Path(tmp.with_suffix(".jpg")).replace(file)
+        if not (dest := Path(tmp).with_suffix(".jpg")).exists():
+            raise FileNotFoundError(f"File not found {dest}")
+        return dest
 
 
 def python_latest(start: str | int | None = None) -> semver.VersionInfo:
