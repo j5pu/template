@@ -18,7 +18,7 @@ clean:
 		src/pdf/data/Reembolsos ./huti-*  .coverage
 
 commit: tests tox
-	@git add .
+	@git add -A .
 	@git commit --quiet -a -m "$${msg:-fix:}" || true
 
 coverage:
