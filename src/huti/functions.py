@@ -67,6 +67,7 @@ from typing import TextIO
 from typing import TypeVar
 
 import bs4
+import fitz
 import jsonpickle
 import packaging.requirements
 import requests
@@ -1425,6 +1426,15 @@ def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
                                    Path(file2).read_bytes().splitlines(), n=1))
 
 
+def pdf_from_jpeg(file: Path | str, picture: Path | str):
+    """Creates pdf from image"""
+    doc = fitz.Document()
+    doc.new_page()
+    page = doc[0]
+    page.insert_image(page.rect, filename=picture)
+    doc.save(Path(file))
+
+
 def pdf_linearize(file: Path | str):
     """linearize pdf (overwrites original)"""
     which("qpdf")
@@ -1549,6 +1559,24 @@ def pdf_scan(file: Path, directory: Path = None) -> Path:
         dest
     ])
     return dest
+
+
+def pdf_to_jpeg(file: Path | str, dpi: int = 300):
+    """Converts first page of pdf to jpeg (overwrites original)"""
+    which("pdftoppm")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir) / "tmp"
+        subprocess.run([
+            "pdftoppm",
+            "-jpeg",
+            "-r",
+            str(dpi),
+            "-singlefile",
+            file,
+            tmp
+        ])
+        Path(tmp.with_suffix(".jpg")).replace(file)
 
 
 def python_latest(start: str | int | None = None) -> semver.VersionInfo:
@@ -2197,7 +2225,7 @@ def version(data: types.ModuleType | pathlib.Path | str | None = None) -> str:
         >>> import huti
         >>> from huti.functions import version
         >>>
-        >>> if (v := version(huti)) and "dev" not in v:
+        >>> if (ver := version(huti)) and "dev" not in ver:
         ...     assert semver.VersionInfo.parse(version(huti))
         >>> assert semver.VersionInfo.parse(version(IPython))  # __version__
         >>> assert version(semver) == version(semver.__file__) == version(pathlib.Path(semver.__file__).parent) \
