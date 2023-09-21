@@ -1,5 +1,6 @@
 generated
 ./huti-*
+.ruff_cache
 
 ### macOS template
 # General
