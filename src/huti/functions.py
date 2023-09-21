@@ -729,7 +729,7 @@ def elementadd(name: str | tuple[str, ...], closing: bool | None = False) -> str
 
 def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
                  upgrade: bool = False,
-                 extras: list[str] = True) -> dict[str, list[packaging.requirements.Requirement]] | None:
+                 extras: bool = True) -> dict[str, list[packaging.requirements.Requirement]] | None:
     # noinspection PyUnresolvedReferences
     """
         List or install dependencies for a package from pyproject.toml, project directory (using pytproject.toml)
