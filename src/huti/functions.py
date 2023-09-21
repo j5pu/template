@@ -729,7 +729,7 @@ def elementadd(name: str | tuple[str, ...], closing: bool | None = False) -> str
 
 def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
                  upgrade: bool = False,
-                 extras: bool = True) -> dict[str, list[packaging.requirements.Requirement]] | None:
+                 extras: bool = True) -> dict[str, list[packaging.requirements.Requirement]] | str | None:
     # noinspection PyUnresolvedReferences
     """
         List or install dependencies for a package from pyproject.toml, project directory (using pytproject.toml)
@@ -841,8 +841,8 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
             up = ["--upgrade", ]
         if extras:
             ex = list(ex.values())
-        subprocess.check_output([sys.executable, "-m", "pip", "install", *up, "-q", *(deps + ex)])
-        return
+        return subprocess.check_output([sys.executable, "-m", "pip", "install", *up, "-q",
+                                        *(deps + flatten(ex, recurse=True))]).decode()
 
     rv = {"dependencies": deps} | ex
     return {key: [packaging.requirements.Requirement(req) for req in value] for key, value in rv.items()}
