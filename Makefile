@@ -14,7 +14,7 @@ build: clean
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m build --wheel
 
 clean:
-	@rm -rf build dist **/*.egg-info *.egg-info .mypy_cache .pytest_cache .tox **/scanned_*.pdf **/generated_*.pdf \
+	@sudo rm -rf build dist **/*.egg-info *.egg-info .mypy_cache .pytest_cache .tox **/scanned_*.pdf **/generated_*.pdf \
 		src/pdf/data/Reembolsos ./huti-*  .coverage .ruff_cache
 
 commit: tests tox
@@ -35,9 +35,10 @@ publish: tag
 
 requirements:
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && test -d venv || python3.11 -m venv venv
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m pip install --upgrade pip pip-tools && \
-		pip-compile --all-extras --no-annotate --quiet -o /tmp/requirements.txt pyproject.toml && \
-		python3 -m pip  install -r /tmp/requirements.txt
+	@venv/bin/python -c "from huti.cli.dependencies import dependencies; dependencies()"
+#	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m pip install --upgrade pip pip-tools && \
+#		pip-compile --all-extras --no-annotate --quiet -o /tmp/requirements.txt pyproject.toml && \
+#		python3 -m pip  install -r /tmp/requirements.txt
 
 tag: commit
 	@NEXT=$$(svu next --strip-prefix) && \
