@@ -2,18 +2,11 @@
 __all__: tuple[str, ...] = ...
 
 import collections
-import signal
 import subprocess
 import tempfile
 from pathlib import Path
-from types import CodeType
-from types import FrameType
-from typing import Any
-from typing import AnyStr
-from typing import Iterable
-from typing import MutableMapping
-from typing import NamedTuple
-from typing import Sequence
+from types import CodeType, FrameType
+from typing import Any, AnyStr, Iterable, MutableMapping, NamedTuple, Sequence
 
 from huti.enums import ChainRV
 from huti.meta import NamedtupleMeta
@@ -56,18 +49,30 @@ class Chain(collections.ChainMap):
 
 
 class CmdError(subprocess.CalledProcessError):
-    def __init__(self, process: subprocess.CompletedProcess = None): ...
+    def __init__(self, process: subprocess.CompletedProcess | None = None): ...
 
     def __str__(self) -> str: ...
 
-FileConfig = NamedTuple("FileConfig", [("file", Path,), ("config", dict,)])
+class FileConfig(NamedTuple):
+    file: Path
+    config: dict
 
-FrameSimple = NamedTuple('FrameSimple', back=FrameType, code=CodeType,
-                         frame=FrameType, function=str,
-                         globals=dict[str, Any], lineno=int, locals=dict[str, Any], name=str,
-                         package=str, path=Path, vars=dict[str, Any])
+class FrameSimple(NamedTuple):
+    back: FrameType
+    code: CodeType
+    frame: FrameType
+    function: str
+    globals: dict[str, Any]
+    lineno: int
+    locals: dict[str, Any]
+    name: str
+    package: str
+    path: Path
+    vars: dict[str, Any]
 
-GroupUser = NamedTuple('GroupUser', group=int | str, user=int | str)
+class GroupUser(NamedTuple):
+    group: int | str
+    user: int | str
 
 class LetterCounter:
     current_value: list[int]

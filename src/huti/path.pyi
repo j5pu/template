@@ -1,56 +1,42 @@
-# coding=utf-8
 import contextlib
 import io
 import os
 import pathlib
-from dataclasses import dataclass
-from dataclasses import Field
-from dataclasses import InitVar
-from typing import Any
-from typing import AnyStr
-from typing import Generic
-from typing import IO
-from typing import Iterable
-from typing import Iterator
-from typing import Literal
-from typing import NamedTuple
-from typing import Type
-from typing import TypeAlias
-from typing import TypeVar
+from dataclasses import Field, InitVar, dataclass
+from typing import IO, Any, AnyStr, Generic, Iterable, Iterator, Literal, NamedTuple, TypeAlias, TypeVar
 
 from huti.enums import PathIs
 from huti.typings import AnyIO
-from huti.typings import TemporaryFileType
 
 __all__: tuple[str, ...] = ...
 _T = TypeVar("_T")
 
 
 class PathAccessor:
-    stat: Type[os.stat] = os.stat
-    open: Type[io.open] = io.open
-    listdir: Type[os.listdir] = os.listdir
-    scandir: Type[os.scandir] = os.scandir
-    chmod: Type[os.chmod] = os.chmod
-    mkdir: Type[os.mkdir] = os.mkdir
-    unlink: Type[os.unlink] = os.unlink
-    link: Type[os.link] = os.link
-    rmdir: Type[os.rmdir] = os.rmdir
-    rename: Type[os.rename] = os.rename
-    replace: Type[os.replace] = os.replace
-    symlink: Type[os.symlink] = os.symlink
+    stat: type[os.stat] = os.stat
+    open: type[io.open] = io.open
+    listdir: type[os.listdir] = os.listdir
+    scandir: type[os.scandir] = os.scandir
+    chmod: type[os.chmod] = os.chmod
+    mkdir: type[os.mkdir] = os.mkdir
+    unlink: type[os.unlink] = os.unlink
+    link: type[os.link] = os.link
+    rmdir: type[os.rmdir] = os.rmdir
+    rename: type[os.rename] = os.rename
+    replace: type[os.replace] = os.replace
+    symlink: type[os.symlink] = os.symlink
 
     def touch(self: Path, path: AnyPath, mode: int = ..., exist_ok: bool = ...) -> None: ...
 
-    readlink: Type[os.link] = os.readlink
+    readlink: type[os.link] = os.readlink
 
     def owner(self: Path, path: AnyPath) -> str | None: ...
 
     def group(self: Path, path: AnyPath) -> str | None: ...
 
-    getcwd: Type[os.getcwd] = os.getcwd
-    expanduser: Type[pathlib._NormalAccessor.expanduser] = os.path.expanduser
-    realpath: Type[pathlib._NormalAccessor.realpath] = os.path.realpath
+    getcwd: type[os.getcwd] = os.getcwd
+    expanduser: type[pathlib._NormalAccessor.expanduser] = os.path.expanduser
+    realpath: type[pathlib._NormalAccessor.realpath] = os.path.realpath
 
 
 class Path(pathlib.Path, pathlib.PurePosixPath, Generic[_T]):
@@ -59,7 +45,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath, Generic[_T]):
     def __call__(self, name: AnyPath = ..., file: PathIs = ..., passwd: Passwd | None = ...,
                  mode: int | str = ..., effective_ids: bool = ..., follow_symlinks: bool = ...) -> Path: ...
 
-    def __new__(cls: Type[Path], *args: AnyPath, **kwargs: Any) -> Path: ...
+    def __new__(cls: type[Path], *args: AnyPath, **kwargs: Any) -> Path: ...
 
     def __contains__(self, value: Iterable) -> bool: ...
 
@@ -214,6 +200,17 @@ class Passwd:
     def from_sudo(cls) -> Passwd: ...
 
 
-PathStat = NamedTuple('PathStat', gid=int, group=str, mode=str, own=str, passwd=Passwd, result=os.stat_result,
-                      root=bool, sgid=bool, sticky=bool, suid=bool, uid=int, user=str)
+class PathStat(NamedTuple):
+    gid: int
+    group: str
+    mode: str
+    own: str
+    passwd: Passwd
+    result: os.stat_result
+    root: bool
+    sgid: bool
+    sticky: bool
+    suid: bool
+    uid: int
+    user: str
 AnyPath: TypeAlias = Path | pathlib.Path | os.PathLike | AnyStr | IO[AnyStr]

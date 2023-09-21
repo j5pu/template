@@ -1,15 +1,7 @@
-# coding=utf-8
 """
 shrc environment package
 """
-from . import default
-from . import env
-from . import main
-from . import misc
-from . import osrelease
-from . import secrets
-from . import system
-
+from . import default, env, main, misc, osrelease, secrets, system
 from .default import *
 from .env import *
 from .main import *

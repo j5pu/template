@@ -17,8 +17,7 @@ import signal
 import string
 import subprocess
 import tempfile
-from typing import AnyStr
-from typing import Sequence
+from typing import AnyStr, Optional, Sequence
 
 from huti.enums import ChainRV
 from huti.typings import StrOrBytesPath
@@ -46,7 +45,7 @@ class CalledProcessError(subprocess.SubprocessError):
     def __init__(self, returncode: int | None = None,
                  cmd: StrOrBytesPath | Sequence[StrOrBytesPath] | None = None,
                  output: AnyStr | None = None, stderr: AnyStr | None = None,
-                 completed: subprocess.CompletedProcess = None) -> None:
+                 completed: Optional[subprocess.CompletedProcess] = None) -> None:
         """
         Patched :class:`subprocess.CalledProcessError`.
 
@@ -103,10 +102,10 @@ class CalledProcessError(subprocess.SubprocessError):
   Return Code:
     {self._message()}
 
-  Command: 
+  Command:
     {self.cmd}
 
-  Stderr: 
+  Stderr:
     {self.stderr}
 
   Stdout:
@@ -235,7 +234,7 @@ Test1(a=1, b=2), <....Test4 object at 0x...>)
         """
     rv = ChainRV.UNIQUE
     default = None
-    maps = list()
+    maps = []  #  noqa: RUF012
 
     def __init__(self, *maps, rv=ChainRV.UNIQUE, default=None):
         super().__init__(*maps)
@@ -248,7 +247,7 @@ Test1(a=1, b=2), <....Test4 object at 0x...>)
             if hasattr(mapping, "_field_defaults"):
                 mapping = mapping._asdict()
             elif hasattr(mapping, 'asdict'):
-                to_dict = getattr(mapping.__class__, 'asdict')
+                to_dict = mapping.__class__.asdict
                 if isinstance(to_dict, property):
                     mapping = mapping.asdict
                 elif callable(to_dict):
@@ -303,7 +302,7 @@ Test1(a=1, b=2), <....Test4 object at 0x...>)
         del self[key]
         return self
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value): # noq: C901
         found = False
         for mapping in self.maps:
             if mapping:

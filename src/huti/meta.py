@@ -4,6 +4,7 @@ Huti Meta Module
 __all__ = (
     "NamedtupleMeta",
 )
+
 import abc
 
 
@@ -23,17 +24,17 @@ class NamedtupleMeta(metaclass=abc.ABCMeta):
         >>> assert issubclass(named, NamedtupleMeta) == True
         >>> assert issubclass(named, tuple) == True
     """
-    _fields = tuple()
-    _field_defaults = dict()
+    _fields = ()
+    _field_defaults = {}  # noqa: RUF012
 
     @abc.abstractmethod
     def _asdict(self):
-        return dict()
+        return {}
 
     # noinspection PyPep8Naming
     @classmethod
     def __subclasshook__(cls, C):
         if cls is NamedtupleMeta:
-            return callable(getattr(C, "_asdict")) and all([issubclass(C, tuple), hasattr(C, "_fields"),
-                                                            hasattr(C, "_field_defaults")])
+            return callable(C._asdict) and all([issubclass(C, tuple), hasattr(C, "_fields"),
+                                                hasattr(C, "_field_defaults")])
         return NotImplemented

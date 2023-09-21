@@ -1,29 +1,22 @@
 """Repo Git Module"""
 import subprocess
 import tempfile
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import InitVar
-from typing import Type
+from dataclasses import InitVar, dataclass, field
+from typing import Optional, Type
 from urllib.parse import ParseResult
 
 import git
 from furl import furl
 from git import Git as GitCmd
-from git import GitCmdObjectDB
-from git import GitConfigParser
+from git import GitCmdObjectDB, GitConfigParser
 from gitdb import LooseObjectDB
 
-from huti.constants import GIT_DEFAULT_SCHEME
-from huti.constants import GITHUB_DOMAIN
+from huti.constants import GIT_DEFAULT_SCHEME, GITHUB_DOMAIN
 from huti.env import GIT
-from huti.functions import aiocmd
-from huti.functions import cmd
-from huti.path import Path
-from huti.path import AnyPath
+from huti.functions import aiocmd, cmd
+from huti.path import AnyPath, Path
 from huti.typings import GitScheme
-from huti.variables import HUTI_PROJECT
-from huti.variables import HUTI_ROOT
+from huti.variables import HUTI_PROJECT, HUTI_ROOT
 
 __all__ = (
     "OwnerRepo",
@@ -91,7 +84,7 @@ class OwnerRepo:
             self.owner = self.url.path.segments[0]
             self.repo = self.url.path.segments[1].removesuffix(".git")
         else:
-            args = dict(scheme=self.scheme, host=GITHUB_DOMAIN, path=[self.owner, self.repo])
+            args = {"scheme": self.scheme, "host": GITHUB_DOMAIN, "path": [self.owner, self.repo]}
             if self.scheme == "git+file":
                 if not self.repo.startswith("/"):
                     raise ValueError(f"Repo must be an absolute file for '{self.scheme}': {self.repo}")
@@ -174,11 +167,11 @@ class Repo(git.Repo):
         Returns:
             Repo: Repo instance
         """
-        super(Repo, self).__init__(path if path is None else Path(path).to_parent(), expand_vars=expand_vars,
+        super().__init__(path if path is None else Path(path).to_parent(), expand_vars=expand_vars,
                                    odbt=odbt, search_parent_directories=search_parent_directories)
 
     @classmethod
-    def bare(cls, name: str = None, repo: "Repo" = None) -> "Repo":
+    def bare(cls, name: Optional[str] = None, repo: "Repo" = None) -> "Repo":
         """
         Create a bare repository in a temporary directory, to manage global/system config or as a remote for testing.
 
@@ -225,7 +218,7 @@ class Repo(git.Repo):
     def origin_url(self) -> furl:
         """Git Origin URL."""
 
-        return furl(list(self.remote().urls)[0])
+        return furl(next(iter(self.remote().urls)))
 
     @property
     def top(self) -> Path:

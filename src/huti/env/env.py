@@ -10,14 +10,10 @@ __all__ = (
 import ipaddress
 import os
 import urllib.parse
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import InitVar
-from ipaddress import IPv4Address
-from ipaddress import IPv6Address
+from dataclasses import InitVar, dataclass, field
+from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
-from typing import Any
-from typing import ClassVar
+from typing import Any, ClassVar
 from urllib.parse import ParseResult
 
 
@@ -50,62 +46,62 @@ class Env:
     """
     The name of the action currently running, or the `id
     <https://docs.github.com/en/enterprise-cloud@latest/actions/using-workflows/workflow-syntax-for-github-actions#jobs\
-        job_idstepsid>`_ of a step. 
+        job_idstepsid>`_ of a step.
 
     For example, for an action, ``__repo-owner_name-of-action-repo``.
 
-    GitHub removes special characters, and uses the name ``__run`` when the current step runs a script without an id. 
+    GitHub removes special characters, and uses the name ``__run`` when the current step runs a script without an id.
 
-    If you use the same script or action more than once in the same job, 
-    the name will include a suffix that consists of the sequence number preceded by an underscore. 
+    If you use the same script or action more than once in the same job,
+    the name will include a suffix that consists of the sequence number preceded by an underscore.
 
-    For example, the first script you run will have the name ``__run``, and the second script will be named ``__run_2``. 
+    For example, the first script you run will have the name ``__run``, and the second script will be named ``__run_2``.
 
     Similarly, the second invocation of ``actions/checkout`` will be ``actionscheckout2``.
     """
 
     GITHUB_ACTION_PATH: Path | str | None = field(default=None, init=False)
     """
-    The path where an action is located. This property is only supported in composite actions. 
+    The path where an action is located. This property is only supported in composite actions.
 
-    You can use this path to access files located in the same repository as the action. 
+    You can use this path to access files located in the same repository as the action.
 
     For example, ``/home/runner/work/_actions/repo-owner/name-of-action-repo/v1``.
     """
 
     GITHUB_ACTION_REPOSITORY: str | None = field(default=None, init=False)
     """
-    For a step executing an action, this is the owner and repository name of the action. 
+    For a step executing an action, this is the owner and repository name of the action.
 
     For example, ``actions/checkout``.
     """
 
     GITHUB_ACTIONS: bool | str | None = field(default=None, init=False)
     """
-    Always set to ``true`` when GitHub Actions is running the workflow. 
+    Always set to ``true`` when GitHub Actions is running the workflow.
 
     You can use this variable to differentiate when tests are being run locally or by GitHub Actions.
     """
 
     GITHUB_ACTOR: str | None = field(default=None, init=False)
     """
-    The name of the person or app that initiated the workflow. 
+    The name of the person or app that initiated the workflow.
 
     For example, ``octocat``.
     """
 
     GITHUB_API_URL: ParseResult | str | None = field(default=None, init=False)
     """
-    API URL. 
+    API URL.
 
     For example: ``https://api.github.com``.
     """
 
     GITHUB_BASE_REF: str | None = field(default=None, init=False)
     """
-    The name of the base ref or target branch of the pull request in a workflow run. 
+    The name of the base ref or target branch of the pull request in a workflow run.
 
-    This is only set when the event that triggers a workflow run is either ``pull_request`` or ``pull_request_target``. 
+    This is only set when the event that triggers a workflow run is either ``pull_request`` or ``pull_request_target``.
 
     For example, ``main``.
     """
@@ -113,11 +109,11 @@ class Env:
     GITHUB_ENV: Path | str | None = field(default=None, init=False)
     # noinspection LongLine
     """
-    The path on the runner to the file that sets environment variables from workflow commands. 
+    The path on the runner to the file that sets environment variables from workflow commands.
 
-    This file is unique to the current step and changes for each step in a job. 
+    This file is unique to the current step and changes for each step in a job.
 
-    For example, ``/home/runner/work/_temp/_runner_file_commands/set_env_87406d6e-4979-4d42-98e1-3dab1f48b13a``. 
+    For example, ``/home/runner/work/_temp/_runner_file_commands/set_env_87406d6e-4979-4d42-98e1-3dab1f48b13a``.
 
     For more information, see `Workflow commands for GitHub Actions.
     <https://docs.github.com/en/enterprise-cloud@latest/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable>`_
@@ -125,30 +121,30 @@ class Env:
 
     GITHUB_EVENT_NAME: str | None = field(default=None, init=False)
     """
-    The name of the event that triggered the workflow. 
+    The name of the event that triggered the workflow.
 
     For example, ``workflow_dispatch``.
     """
 
     GITHUB_EVENT_PATH: Path | str | None = field(default=None, init=False)
     """
-    The path to the file on the runner that contains the full event webhook payload. 
+    The path to the file on the runner that contains the full event webhook payload.
 
     For example, ``/github/workflow/event.json``.
     """
 
     GITHUB_GRAPHQL_URL: ParseResult | str | None = field(default=None, init=False)
     """
-    Returns the GraphQL API URL. 
+    Returns the GraphQL API URL.
 
     For example: ``https://api.github.com/graphql``.
     """
 
     GITHUB_HEAD_REF: str | None = field(default=None, init=False)
     """
-    The head ref or source branch of the pull request in a workflow run. 
+    The head ref or source branch of the pull request in a workflow run.
 
-    This property is only set when the event that triggers a workflow run is either 
+    This property is only set when the event that triggers a workflow run is either
     ``pull_request`` or ``pull_request_target``.
 
     For example, ``feature-branch-1``.
@@ -158,8 +154,8 @@ class Env:
     # noinspection LongLine
     """
     The `job_id
-    <https://docs.github.com/en/enterprise-cloud@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_id>`_ 
-    of the current job. 
+    <https://docs.github.com/en/enterprise-cloud@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_id>`_
+    of the current job.
 
     For example, ``greeting_job``.
     """
@@ -167,12 +163,12 @@ class Env:
     GITHUB_PATH: Path | str | None = field(default=None, init=False)
     # noinspection LongLine
     """
-    The path on the runner to the file that sets system PATH variables from workflow commands. 
-    This file is unique to the current step and changes for each step in a job. 
+    The path on the runner to the file that sets system PATH variables from workflow commands.
+    This file is unique to the current step and changes for each step in a job.
 
-    For example, ``/home/runner/work/_temp/_runner_file_commands/add_path_899b9445-ad4a-400c-aa89-249f18632cf5``. 
+    For example, ``/home/runner/work/_temp/_runner_file_commands/add_path_899b9445-ad4a-400c-aa89-249f18632cf5``.
 
-    For more information, see 
+    For more information, see
     `Workflow commands for GitHub Actions.
      <https://docs.github.com/en/enterprise-cloud@latest/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path>`_
     """
@@ -181,18 +177,18 @@ class Env:
     """
     The branch or tag ref that triggered the workflow run.
 
-    For branches this is the format ``refs/heads/<branch_name>``, 
-    for tags it is ``refs/tags/<tag_name>``, 
-    and for pull requests it is ``refs/pull/<pr_number>/merge``. 
+    For branches this is the format ``refs/heads/<branch_name>``,
+    for tags it is ``refs/tags/<tag_name>``,
+    and for pull requests it is ``refs/pull/<pr_number>/merge``.
 
-    This variable is only set if a branch or tag is available for the event type. 
+    This variable is only set if a branch or tag is available for the event type.
 
     For example, ``refs/heads/feature-branch-1``.
     """
 
     GITHUB_REF_NAME: str | None = field(default=None, init=False)
     """
-    The branch or tag name that triggered the workflow run. 
+    The branch or tag name that triggered the workflow run.
 
     For example, ``feature-branch-1``.
     """
@@ -204,7 +200,7 @@ class Env:
 
     GITHUB_REF_TYPE: str | None = field(default=None, init=False)
     """
-    The type of ref that triggered the workflow run. 
+    The type of ref that triggered the workflow run.
 
     Valid values are ``branch`` or ``tag``.
 
@@ -213,28 +209,28 @@ class Env:
 
     GITHUB_REPOSITORY: str | None = field(default=None, init=False)
     """
-    The owner and repository name. 
+    The owner and repository name.
 
     For example, ``octocat/Hello-World``.
     """
 
     GITHUB_REPOSITORY_OWNER: str | None = field(default=None, init=False)
     """
-    The repository owner's name. 
+    The repository owner's name.
 
     For example, ``octocat``.
     """
 
     GITHUB_RETENTION_DAYS: str | None = field(default=None, init=False)
     """
-    The number of days that workflow run logs and artifacts are kept. 
+    The number of days that workflow run logs and artifacts are kept.
 
     For example, ``90``.
     """
 
     GITHUB_RUN_ATTEMPT: str | None = field(default=None, init=False)
     """
-    A unique number for each attempt of a particular workflow run in a repository. 
+    A unique number for each attempt of a particular workflow run in a repository.
 
     This number begins at ``1`` for the workflow run's first attempt, and increments with each re-run.
 
@@ -243,18 +239,18 @@ class Env:
 
     GITHUB_RUN_ID: str | None = field(default=None, init=False)
     """
-    A unique number for each workflow run within a repository. 
+    A unique number for each workflow run within a repository.
 
-    This number does not change if you re-run the workflow run. 
+    This number does not change if you re-run the workflow run.
 
     For example, ``1658821493``.
     """
 
     GITHUB_RUN_NUMBER: str | None = field(default=None, init=False)
     """
-    A unique number for each run of a particular workflow in a repository. 
+    A unique number for each run of a particular workflow in a repository.
 
-    This number begins at ``1`` for the workflow's first run, and increments with each new run. 
+    This number begins at ``1`` for the workflow's first run, and increments with each new run.
     This number does not change if you re-run the workflow run.
 
     For example, ``3``.
@@ -262,43 +258,43 @@ class Env:
 
     GITHUB_SERVER_URL: ParseResult | str | None = field(default=None, init=False)
     """
-    The URL of the GitHub Enterprise Cloud server. 
+    The URL of the GitHub Enterprise Cloud server.
 
     For example: ``https://github.com``.
     """
 
     GITHUB_SHA: str | None = field(default=None, init=False)
     """
-    The commit SHA that triggered the workflow. 
+    The commit SHA that triggered the workflow.
 
     The value of this commit SHA depends on the event that triggered the workflow.
-    For more information, see `Events that trigger workflows. 
-    <https://docs.github.com/en/enterprise-cloud@latest/actions/using-workflows/events-that-trigger-workflows>`_ 
+    For more information, see `Events that trigger workflows.
+    <https://docs.github.com/en/enterprise-cloud@latest/actions/using-workflows/events-that-trigger-workflows>`_
 
     For example, ``ffac537e6cbbf934b08745a378932722df287a53``.
     """
 
     GITHUB_WORKFLOW: Path | str | None = field(default=None, init=False)
     """
-    The name of the workflow. 
+    The name of the workflow.
 
-    For example, ``My test workflow``. 
+    For example, ``My test workflow``.
 
-    If the workflow file doesn't specify a name, 
+    If the workflow file doesn't specify a name,
     the value of this variable is the full path of the workflow file in the repository.
     """
 
     GITHUB_WORKSPACE: Path | str | None = field(default=None, init=False)
     """
-    The default working directory on the runner for steps, and the default location of your repository 
-    when using the `checkout <https://github.com/actions/checkout>`_ action. 
+    The default working directory on the runner for steps, and the default location of your repository
+    when using the `checkout <https://github.com/actions/checkout>`_ action.
 
     For example, ``/home/runner/work/my-repo-name/my-repo-name``.
     """
 
     RUNNER_ARCH: str | None = field(default=None, init=False)
     """
-    The architecture of the runner executing the job. 
+    The architecture of the runner executing the job.
 
     Possible values are ``X86``, ``X64``, ``ARM``, or ``ARM64``.
 
@@ -307,27 +303,27 @@ class Env:
 
     RUNNER_NAME: str | None = field(default=None, init=False)
     """
-    The name of the runner executing the job. 
+    The name of the runner executing the job.
 
     For example, ``Hosted Agent``.
     """
 
     RUNNER_OS: str | None = field(default=None, init=False)
     """
-    The operating system of the runner executing the job. 
+    The operating system of the runner executing the job.
 
-    Possible values are ``Linux``, ``Windows``, or ``macOS``. 
+    Possible values are ``Linux``, ``Windows``, or ``macOS``.
 
     For example, ``Linux``.
     """
 
     RUNNER_TEMP: Path | str | None = field(default=None, init=False)
     """
-    The path to a temporary directory on the runner. 
+    The path to a temporary directory on the runner.
 
-    This directory is emptied at the beginning and end of each job. 
+    This directory is emptied at the beginning and end of each job.
 
-    Note that files will not be removed if the runner's user account does not have permission to delete them. 
+    Note that files will not be removed if the runner's user account does not have permission to delete them.
 
     For example, ``_temp``.
     """
@@ -335,12 +331,12 @@ class Env:
     RUNNER_TOOL_CACHE: str | None = field(default=None, init=False)
     # noinspection LongLine
     """
-    The path to the directory containing preinstalled tools for GitHub-hosted runners. 
+    The path to the directory containing preinstalled tools for GitHub-hosted runners.
 
-    For more information, see `About GitHub-hosted runners. 
+    For more information, see `About GitHub-hosted runners.
     <https://docs.github.com/en/enterprise-cloud@latest/actions/reference/specifications-for-github-hosted-runners/#supported-software>`_
 
-    `Ubuntu latest <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`_ 
+    `Ubuntu latest <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`_
     `macOS latest <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`_
 
     For example, ``C:/hostedtoolcache/windows``.

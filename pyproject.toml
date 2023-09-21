@@ -34,6 +34,7 @@ dev = [
     "pip-tools",
     "pyflyby",
     "python-semantic-release",
+    "ruff",
     "twine",
     "vendorize"
 ]
@@ -72,6 +73,11 @@ tests = [
 [tool.setuptools.packages.find]
 where = ["src"]  # ["."] by default
 
+[project.scripts]
+dependencies = "huti.cli.dependencies:app"
+requirements = "huti.cli.dependencies:app"
+huti = "huti.cli.app:app"
+
 [build-system]
 requires = ['setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
@@ -82,53 +88,3 @@ build-backend = 'setuptools.build_meta'
 build_command = "python -m build --wheel"
 tag_format = "{version}"
 
-[tool.ruff]
-target-version = "py37"
-line-length = 120
-fix = true
-select = [
-    # flake8-2020
-    "YTT",
-    # flake8-bandit
-    "S",
-    # flake8-bugbear
-    "B",
-    # flake8-builtins
-    "A",
-    # flake8-comprehensions
-    "C4",
-    # flake8-debugger
-    "T10",
-    # flake8-simplify
-    "SIM",
-    # isort
-    "I",
-    # mccabe
-    "C90",
-    # pycodestyle
-    "E", "W",
-    # pyflakes
-    "F",
-    # pygrep-hooks
-    "PGH",
-    # pyupgrade
-    "UP",
-    # ruff
-    "RUF",
-    # tryceratops
-    "TRY",
-]
-ignore = [
-    # LineTooLong
-    "E501",
-    # DoNotAssignLambda
-    "E731",
-]
-
-[tool.coverage.report]
-skip_empty = true
-[tool.coverage.html]
-directory = "coverage_html_report"
-[tool.coverage.run]
-branch = true
-source = ["src"]

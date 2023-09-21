@@ -8,9 +8,7 @@ __all__ = (
 )
 import enum
 from pathlib import Path
-from typing import Any
-from typing import cast
-from typing import IO
+from typing import IO, Any, Optional, cast
 
 import click
 import typer
@@ -24,9 +22,9 @@ class _Color(EnumLower):
                  message: Any = "",
                  exit: int | None = None,
                  stderr: bool = True,
-                 file: IO[Any] | str = None,
+                 file: Optional[IO[Any] | str] = None,
                  newline: bool = True,
-                 bg: str | int | tuple[int, int, int] = None,
+                 bg: Optional[str | int | tuple[int, int, int]] = None,
                  bold: bool | None = None,
                  dim: bool | None = None,
                  underline: bool | None = None,
@@ -123,7 +121,7 @@ class Color(_Color):
     """reset the color only, not styles: bold, underline, etc."""
 
     def style(self, text: Any,
-              bg: str | int | tuple[int, int, int] = None,
+              bg: Optional[str | int | tuple[int, int, int]] = None,
               bold: bool | None = None,
               dim: bool | None = None,
               underline: bool | None = None,

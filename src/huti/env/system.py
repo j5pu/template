@@ -48,7 +48,6 @@ from pathlib import Path
 
 from .main import environment
 
-
 ALPINE: bool
 """'DIST_ID' is 'alpine' and not: nix or busybox"""
 

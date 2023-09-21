@@ -1,23 +1,19 @@
 """Puntos Project Module"""
 import subprocess
-from types import SimpleNamespace
-
 import sys
 import sysconfig
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import InitVar
-from packaging.specifiers import SpecifierSet
+from dataclasses import InitVar, dataclass, field
+from types import SimpleNamespace
 from typing import ClassVar
 
 import setuptools.config
 import toml
+from packaging.specifiers import SpecifierSet
 
 from huti.classes import FileConfig
 from huti.constants import venv
 from huti.functions import toiter
-from huti.path import AnyPath
-from huti.path import Path
+from huti.path import AnyPath, Path
 from huti.variables import HUTI_ROOT
 
 __all__ = (
@@ -97,7 +93,7 @@ class EnvBuilder(venv.EnvBuilder):
         """
         super().__init__(system_site_packages=self.system_site_packages, clear=self.clear, symlinks=self.symlinks,
                          upgrade=self.upgrade, with_pip=self.with_pip, prompt=self.prompt,
-                         **(dict(upgrade_deps=self.upgrade_deps) if sys.version_info >= (3, 9) else {}))
+                         **({"upgrade_deps": self.upgrade_deps} if sys.version_info >= (3, 9) else {}))
         if self.env_dir:
             self.env_dir = Path(self.env_dir)
             if self.env_dir.exists():
@@ -206,7 +202,7 @@ class Project(ProjectBase):
     """venv builder"""
 
     pip_install_options: ClassVar[tuple[str, ...]] = ("-m", "pip", "install", "--quiet", "--no-warn-script-location", )
-    pip_upgrade_options: ClassVar[tuple[str, ...]] = pip_install_options + ("--upgrade", )
+    pip_upgrade_options: ClassVar[tuple[str, ...]] = (*pip_install_options, "--upgrade")
 
     def __post_init__(self, data):
         """
@@ -226,8 +222,8 @@ class Project(ProjectBase):
                 metadata = self.setup_cfg.config.get("metadata", {})
                 self.pypi_name = metadata.get('name', None)
 
-                options = self.setup_cfg.config.get('options', dict())
-                self.extras_require = tuple(sorted({dep for extra in options.get('extras_require', dict()).values()
+                options = self.setup_cfg.config.get('options', {})
+                self.extras_require = tuple(sorted({dep for extra in options.get('extras_require', {}).values()
                                                     for dep in extra}))
                 self.install_requires = tuple(options.get('install_requires', []))
                 self.py_packages = tuple(options.get('packages', []))
@@ -257,7 +253,7 @@ class Project(ProjectBase):
     @property
     def python_requires(self) -> str:
         if len(self._python_requires) > 0:
-            return list(self._python_requires)[0].version
+            return next(iter(self._python_requires)).version
         return ""
 
     @python_requires.setter

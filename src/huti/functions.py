@@ -52,19 +52,22 @@ import tempfile
 import time
 import types
 from pathlib import Path
-from typing import Any
-from typing import AnyStr
-from typing import Callable
-from typing import cast
-from typing import Coroutine
-from typing import Generic
-from typing import Iterable
-from typing import Literal
-from typing import MutableMapping
-from typing import OrderedDict
-from typing import ParamSpec
-from typing import TextIO
-from typing import TypeVar
+from typing import (
+    Any,
+    AnyStr,
+    Callable,
+    Coroutine,
+    Generic,
+    Iterable,
+    Literal,
+    MutableMapping,
+    Optional,
+    OrderedDict,
+    ParamSpec,
+    TextIO,
+    TypeVar,
+    cast,
+)
 
 import bs4
 import fitz
@@ -77,31 +80,14 @@ import structlog
 import toml
 
 from huti.alias import RunningLoop
-from huti.classes import CalledProcessError
-from huti.classes import CmdError
-from huti.classes import FrameSimple
-from huti.classes import GroupUser
-from huti.classes import TempDir
-from huti.constants import HUTI_DATA
-from huti.constants import HUTI_DATA_TESTS
-from huti.constants import PDF_REDUCE_THRESHOLD
-from huti.constants import PYTHON_FTP
-from huti.constants import SCAN_PREFIX
-from huti.constants import venv
+from huti.classes import CalledProcessError, CmdError, FrameSimple, GroupUser, TempDir
+from huti.constants import HUTI_DATA, PDF_REDUCE_THRESHOLD, PYTHON_FTP, SCAN_PREFIX, venv
 from huti.datas import Top
-from huti.enums import FileName
-from huti.enums import PathIs
-from huti.enums import PathSuffix
+from huti.enums import FileName, PathIs, PathSuffix
 from huti.env import USER
-from huti.exceptions import InvalidArgument
-from huti.exceptions import CommandNotFound
-from huti.typings import AnyPath
-from huti.typings import ExcType
-from huti.typings import StrOrBytesPath
-from huti.variables import EXECUTABLE
-from huti.variables import EXECUTABLE_SITE
-from huti.variables import PW_ROOT
-from huti.variables import PW_USER
+from huti.exceptions import CommandNotFound, InvalidArgument
+from huti.typings import AnyPath, ExcType, StrOrBytesPath
+from huti.variables import EXECUTABLE, EXECUTABLE_SITE, PW_ROOT, PW_USER
 
 P = ParamSpec('P')
 T = TypeVar('T')
@@ -286,7 +272,7 @@ def allin(origin: Iterable, destination: Iterable) -> bool:
     """
     origin = toiter(origin)
     destination = toiter(destination)
-    return all(map(lambda x: x in destination, origin))
+    return all(x in destination for x in origin)
 
 
 def ami(user: str = "root") -> bool:
@@ -344,7 +330,7 @@ def anyin(origin: Iterable, destination: Iterable) -> Any | None:
             return item
 
 
-def brew_bundle(brewfile: Path | str = HUTI_DATA / 'Brewfile', c: str = None) -> int:
+def brew_bundle(brewfile: Path | str = HUTI_DATA / 'Brewfile', c: Optional[str] = None) -> int:
     """
     Installs brewfile under data directory
 
@@ -637,15 +623,12 @@ def cmdrun(data: Iterable, exc: bool = False, lines: bool = True, shell: bool = 
     if py:
         m = '-m'
         if isinstance(data, str) and data.startswith('/'):
-            m = str()
+            m = ""
         data = f'{EXECUTABLE_SITE if pysite else EXECUTABLE} {m} {data}'
     elif not shell:
         data = toiter(data)
 
-    if lines:
-        text = False
-    else:
-        text = True
+    text = not lines
 
     proc = subprocess.run(data, shell=shell, capture_output=True, text=text)
 
@@ -721,7 +704,7 @@ def command(*args, **kwargs) -> subprocess.CompletedProcess:
 
 def current_task_name() -> str:
     """Current asyncio task name"""
-    return asyncio.current_task().get_name() if aioloop() else str()
+    return asyncio.current_task().get_name() if aioloop() else ""
 
 
 def elementadd(name: str | tuple[str, ...], closing: bool | None = False) -> str:
@@ -750,7 +733,7 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
     # noinspection PyUnresolvedReferences
     """
         List or install dependencies for a package from pyproject.toml, project directory (using pytproject.toml)
-            or package name. If package name will search on Distrobution
+            or package name. If package name will search on Distribution
 
         Examples:
             >>> from pathlib import Path
@@ -809,8 +792,9 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
                 package name to search in Distribution or project; directory to add pyproject.toml
         """
 
-    def quote(data):  # noqa
-        return [f'"{i}"' if {'>', '<'} & set(i) else i for i in data]
+    # noinspection PyUnusedLocal
+    def quote(d):
+        return [f'"{i}"' if {'>', '<'} & set(i) else i for i in d]
 
     deps, ex, error, read, up = [], {}, None, True, []
 
@@ -856,12 +840,11 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
         if upgrade:
             up = ["--upgrade", ]
         if extras:
-            ex = [value for value in ex.values()]
-        subprocess.check_output([sys.executable, '-m', 'pip', 'install', ] + up +
-                                ['-q', *deps + ex])
+            ex = list(ex.values())
+        subprocess.check_output([sys.executable, "-m", "pip", "install", *up, "-q", *(deps + ex)])
         return
 
-    rv = dict(dependencies=deps) | ex
+    rv = {"dependencies": deps} | ex
     return {key: [packaging.requirements.Requirement(req) for req in value] for key, value in rv.items()}
 
 
@@ -901,7 +884,7 @@ def dict_sort(data: dict[_KT, _VT], ordered: bool = False,
     return data
 
 
-def distribution(data: pathlib.Path | str = None) -> importlib.metadata.Distribution:
+def distribution(data: Optional[pathlib.Path | str] = None) -> importlib.metadata.Distribution:
     """
     Package installed version
 
@@ -1509,13 +1492,14 @@ def pdf_reduce(path: Path | str, level: Literal["/default", "/prepress", "ebook"
             Path(tmp).replace(path)
 
 
-def pdf_scan(file: Path, directory: Path = None) -> Path:
+def pdf_scan(file: Path, directory: Optional[Path] = None) -> Path:
     """
     Looks like scanned, linearize and sets tag color
 
     Examples:
         >>> from pathlib import Path
         >>> from huti.constants import HUTI_DATA
+        >>> from huti.constants import HUTI_DATA_TESTS
         >>> from huti.constants import SCAN_PREFIX
         >>> from huti.functions import pdf_scan
         >>>
@@ -1658,7 +1642,7 @@ def python_versions() -> list[semver.VersionInfo, ...]:
         Tuple of Python Versions
     """
     rv = []
-    for link in bs4.BeautifulSoup(requests.get(PYTHON_FTP).text, 'html.parser').find_all('a'):
+    for link in bs4.BeautifulSoup(requests.get(PYTHON_FTP, timeout=2).text, 'html.parser').find_all('a'):
         if link := re.match(r'((3\.([7-9]|[1-9][0-9]))|4).*', link.get('href').rstrip('/')):
             rv.append(semver.VersionInfo.parse(link.string))
     return sorted(rv)
@@ -1684,7 +1668,7 @@ def request_x_api_key_json(url, key: str = "") -> dict[str, str] | None:
         response json
     """
     headers = {"headers": {'X-Api-Key': key}} if key else {}
-    response = requests.get(url, **headers)
+    response = requests.get(url, **headers, timeout=2)
     if response.status_code == requests.codes.ok:
         return response.json()
 
@@ -1829,7 +1813,7 @@ def strip(obj: str | Iterable[str], ansi: bool = False, new: bool = True) -> str
 
 def superproject(path: pathlib.Path | str = "") -> pathlib.Path | None:
     """
-    Show the absolute resolved path of the root of the superproject’s working tree (if exists) that uses the current
+    Show the absolute resolved path of the root of the superproject's working tree (if exists) that uses the current
     repository as its submodule (--show-superproject-working-tree) or show the absolute path of the
     top-level directory of the working tree (--show-toplevel).
 
@@ -2146,7 +2130,7 @@ venv=...)
 
     if isinstance(data, types.ModuleType):
         p = data.__file__
-    elif isinstance(data, str) or isinstance(data, (pathlib.Path, pathlib.PurePath)):
+    elif isinstance(data, (str, pathlib.Path, pathlib.PurePath)):
         p = data
     else:
         p = os.getcwd()
@@ -2174,10 +2158,7 @@ venv=...)
             finish = root.parent if root else None
             if (start := start.parent) == (finish or pathlib.Path('/')):
                 break
-    if root is None and pyproject_toml:
-        root = pyproject_toml.parent
-    else:
-        root = path
+    root = pyproject_toml.parent if root is None and pyproject_toml else path
     if pyproject_toml:
         name = toml.load(pyproject_toml)["project"]["name"]
     elif path:

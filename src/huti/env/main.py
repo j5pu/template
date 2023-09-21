@@ -6,13 +6,11 @@ __all__ = (
     "environment",
 )
 
+import ipaddress
 import os
 import sys
-import ipaddress
 import urllib.parse
-
-from ipaddress import IPv4Address
-from ipaddress import IPv6Address
+from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
 from urllib.parse import ParseResult
 

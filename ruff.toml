@@ -1,0 +1,86 @@
+target-version = "py37"
+line-length = 120
+fix = true
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    "TRY",
+]
+
+ignore = [
+    # is too comple
+    "C901",
+    # `subprocess` call: check for execution of untrusted input
+    "S603",
+    # long messages outside the exception class
+    "TRY003"
+]
+
+[per-file-ignores]
+"src/huti/__init__.py" = [
+    # unable to detect undefined names
+    "F403",
+]
+"src/huti/classes.py" = [
+    # is too complex
+    "A003",
+]
+"src/huti/classes.pyi" = [
+    # shadowing a Python builtin
+    "A003",
+    "RUF001",
+]
+"src/huti/color.py" = [
+    # shadowing a Python builtin
+    "A002",
+    # ,String contains ambiguous
+    "RUF001",
+]
+"src/huti/color.pyi" = [
+    # shadowing a Python builtin
+    "A002",
+]
+"src/huti/env/__init__.py" = [
+    # unable to detect undefined names
+    "F403",
+]
+"src/huti/functions.py" = [
+    # `subprocess` call with `shell=True` identified, security issue
+    "S602",
+    # Starting a process with a partial executable path
+    "S607",
+    # tandard pseudo-random generators are not suitable for cryptographic purposes
+    "S311"
+]
+"src/huti/path.pyi" = [
+    # shadowing a Python builtin
+    "A003"
+]
+

@@ -18,16 +18,11 @@ import subprocess
 import sys
 import tempfile
 import tokenize
-
-from dataclasses import dataclass
-from dataclasses import field
-from dataclasses import InitVar
-from typing import cast
-from typing import TypeAlias
+from dataclasses import InitVar, dataclass, field
+from typing import TypeAlias, cast
 
 from huti.enums import PathIs
-from huti.functions import toiter
-from huti.functions import which
+from huti.functions import toiter, which
 from huti.typings import AnyPath
 from huti.variables import MACOS
 
@@ -92,7 +87,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             bool
         """
         value = self.__class__(value) if isinstance(value, str) and "/" in value else toiter(value)
-        return all([item in self.resolve().parts for item in value])
+        return all(item in self.resolve().parts for item in value)
 
     def __eq__(self, other):
         """
@@ -526,8 +521,8 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             contents: copy contents of self to dest, `cp src/ dest` instead of `cp src dest` (default: False)`.
             effective_ids: If True, access will use the effective uid/gid instead of
                 the real uid/gid (default: False).
-            follow_symlinks: `-P´ the `cp` default, no symlinks are followed,
-                all symbolic links are followed when True `-L´ (actual files are copyed but if there are existing links
+            follow_symlinks: '-P' the 'cp' default, no symlinks are followed,
+                all symbolic links are followed when True '-L' (actual files are copyed but if there are existing links
                 will be left them untouched) (default: False)
                 `-H` cp option is not implemented (default: False).
             preserve: preserve file attributes (default: False).
@@ -549,7 +544,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             *(["-R"] if self.is_dir() else []),
             *(["-L"] if follow_symlinks else []),
             *(["-p"] if preserve else []),
-            f"{str(self)}{'/' if contents else ''}", dest
+            f"{self!s}{'/' if contents else ''}", dest
         ], check=True, capture_output=True)
 
         return dest
@@ -694,7 +689,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             bool
         """
         value = self.__class__(value) if isinstance(value, str) and "/" in value else toiter(value)
-        return all([item in self.parts for item in value])
+        return all(item in self.parts for item in value)
 
     def ln(self, dest, force=True):
         """
@@ -826,7 +821,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
                        capture_output=True)
         return dest
 
-    def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None, token=False):
+    def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None, token=False):  # noqa: A003
         """
         Open the file pointed by this path and return a file object, as
         the built-in open() function does.
@@ -1014,7 +1009,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         if name and (not target.exists() or not self.cmp(target)):
             self.cp(target, effective_ids=effective_ids, follow_symlinks=follow_symlinks)
             change = True
-        elif not (target.stats().result.st_mode & mod == mod):
+        elif target.stats().result.st_mode & mod != mod:
             change = True
         if target.owner() != "root":
             change = True
@@ -1072,7 +1067,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         if name and (not target.exists() or not self.cmp(target)):
             self.cp(target, effective_ids=effective_ids, follow_symlinks=follow_symlinks)
             change = True
-        elif not (target.stats().result.st_mode & mod == mod):
+        elif target.stats().result.st_mode & mod != mod:
             change = True
         if target.owner() != "root":
             change = True
@@ -1151,11 +1146,11 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             uid: file UID
             user: file owner name
         """
-        mapping = dict(
-            sgid=stat.S_ISGID | stat.S_IXGRP,
-            suid=stat.S_ISUID | stat.S_IXUSR,
-            sticky=stat.S_ISVTX,
-        )
+        mapping = {
+            "sgid": stat.S_ISGID | stat.S_IXGRP,
+            "suid": stat.S_ISUID | stat.S_IXUSR,
+            "sticky": stat.S_ISVTX,
+        }
         result = os.stat(self, follow_symlinks=follow_symlinks)
         passwd = Passwd(result.st_uid)
         return PathStat(
@@ -1168,7 +1163,7 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
             root=result.st_uid == 0,
             uid=result.st_uid,
             user=passwd.user,
-            **{i: result.st_mode & mapping[i] == mapping[i] for i in PathStat._fields if i in mapping.keys()}
+            **{i: result.st_mode & mapping[i] == mapping[i] for i in PathStat._fields if i in mapping}
         )
 
     def sudo(self, force=False, to_list=True, os_mode=os.W_OK, effective_ids=False, follow_symlinks=False):
@@ -1257,12 +1252,11 @@ class Path(pathlib.Path, pathlib.PurePosixPath):
         Returns:
             Directory Path.
         """
-        with cls.tempdir(suffix=suffix, prefix=prefix, directory=directory) as tmpdir:
-            with tmpdir.cd():
-                try:
-                    yield tmpdir
-                finally:
-                    pass
+        with cls.tempdir(suffix=suffix, prefix=prefix, directory=directory) as tmpdir, tmpdir.cd():
+            try:
+                yield tmpdir
+            finally:
+                pass
 
     @classmethod
     @contextlib.contextmanager

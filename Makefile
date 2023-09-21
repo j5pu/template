@@ -24,6 +24,8 @@ commit: tests tox
 coverage:
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && coverage run -m pytest && coverage report
 
+lint:
+	@{ [ "$${CI-}" ] || source venv/bin/activate; } && ruff check src
 
 publish: tag
 	@make build
@@ -56,7 +58,7 @@ secrets:
 	@grep -v GITHUB_ /Users/j5pu/secrets/profile.d/secrets.sh > /tmp/secrets
 	@gh secret set -f  /tmp/secrets
 
-tests: build
+tests: lint build
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && pytest
 
 tox:

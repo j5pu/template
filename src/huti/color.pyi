@@ -1,8 +1,7 @@
-# coding=utf-8
 import enum
 from enum import Enum
-from typing import Any
-from typing import IO
+from typing import IO, Any
+
 from .classes import EnumLower
 
 __all__: tuple[str, ...] = ...

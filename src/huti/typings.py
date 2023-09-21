@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 .dotfiles Typings Module
 """
@@ -6,12 +5,7 @@ import os
 import tempfile
 from os import PathLike
 from pathlib import Path
-from typing import AnyStr
-from typing import IO
-from typing import Literal
-from typing import Type
-from typing import TypeAlias
-from typing import Union
+from typing import IO, AnyStr, Literal, Type, TypeAlias, Union
 
 __all__ = (
     "AnyIO",

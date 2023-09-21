@@ -1,0 +1,6 @@
+[html]
+directory = "coverage_html_report"
+[report]
+skip_empty = true
+[run]
+source = "src"
