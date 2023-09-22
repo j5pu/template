@@ -30,6 +30,6 @@ SUDO_GID: int
 SUDO_UID: int
 SUDO_USER: str
 USER: str
-VIRTUAL_ENV: str
+VIRTUAL_ENV: Path
 
 environment()

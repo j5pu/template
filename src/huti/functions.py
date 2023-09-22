@@ -133,7 +133,7 @@ from huti.classes import CalledProcessError, CmdError, FrameSimple, GroupUser, T
 from huti.constants import HUTI_DATA, PDF_REDUCE_THRESHOLD, PYTHON_FTP, SCAN_PREFIX, venv
 from huti.datas import Top
 from huti.enums import FileName, PathIs, PathSuffix
-from huti.env import USER
+from huti.env import USER, VIRTUAL_ENV
 from huti.exceptions import CommandNotFound, InvalidArgument
 from huti.typings import AnyPath, ExcType, StrOrBytesPath
 from huti.variables import EXECUTABLE, EXECUTABLE_SITE, PW_ROOT, PW_USER
@@ -881,8 +881,9 @@ def dependencies(
             ]
         if extras:
             ex = list(ex.values())
+        executable = VIRTUAL_ENV / "bin/python" if VIRTUAL_ENV and VIRTUAL_ENV.is_dir() else sys.executable
         return subprocess.check_output(
-            [sys.executable, "-m", "pip", "install", *up, "-q", *(deps + flatten(ex, recurse=True))]
+            [executable, "-m", "pip", "install", *up, "-q", *(deps + flatten(ex, recurse=True))]
         ).decode()
 
     rv = {"dependencies": deps} | ex
