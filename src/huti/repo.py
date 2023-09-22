@@ -168,7 +168,7 @@ class Repo(git.Repo):
             Repo: Repo instance
         """
         super().__init__(path if path is None else Path(path).to_parent(), expand_vars=expand_vars,
-                                   odbt=odbt, search_parent_directories=search_parent_directories)
+                         odbt=odbt, search_parent_directories=search_parent_directories)
 
     @classmethod
     def bare(cls, name: Optional[str] = None, repo: "Repo" = None) -> "Repo":

@@ -2,9 +2,11 @@ import enum
 from enum import Enum
 from typing import IO, Any
 
-from .classes import EnumLower
+from .enums import EnumLower
 
 __all__: tuple[str, ...] = ...
+
+
 class _Color(EnumLower):
     # noinspection PyShadowingBuiltins
     def __call__(self,
@@ -23,9 +25,13 @@ class _Color(EnumLower):
                  reverse: bool | None = ...,
                  strikethrough: bool | None = ...,
                  reset: bool = ...,
-                 colorize: bool | None = None) -> ...:...
+                 colorize: bool | None = None) -> ...: ...
+
+
 class _ColorAuto:
     value = enum._auto_null
+
+
 class Color(_Color):
     BLACK = ...
     BLUE = ...
@@ -55,7 +61,9 @@ class Color(_Color):
               blink: bool | None = ...,
               reverse: bool | None = ...,
               strikethrough: bool | None = ...,
-              reset: bool = True) -> str:...
+              reset: bool = True) -> str: ...
+
+
 COLOR_FIRST_OTHER = {
     "first": {"bold": ..., "italic": ..., },
     "other": {"bold": ..., "italic": ..., },
@@ -74,8 +82,11 @@ SYMBOL = {
     "PLUS": {"text": ..., "fg": ..., },
     "WAIT": {"text": ..., "fg": ..., },
 }
+
+
 class _Symbol(Enum):
     def _generate_next_value_(self: str, start: int, count: int, last_values: list[Any]) -> Any: ...
+
     def __call__(self,
                  first: Any = ...,
                  other: Any = ...,
@@ -84,9 +95,13 @@ class _Symbol(Enum):
                  stderr: bool = ...,
                  file: IO[Any] | str | None = ...,
                  newline: bool = ...,
-                 colorize: bool | None = None) -> ...:...
+                 colorize: bool | None = None) -> ...: ...
+
+
 class _SymbolAuto:
     value: enum._auto_null
+
+
 class Symbol(_Symbol):
     CRITICAL = ...
     ERROR = ...

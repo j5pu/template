@@ -35,6 +35,7 @@ dev = [
     "pyflyby",
     "python-semantic-release",
     "ruff",
+    "ruff-lsp",
     "twine",
     "vendorize"
 ]

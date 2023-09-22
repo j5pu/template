@@ -201,7 +201,7 @@ class Project(ProjectBase):
     venv: EnvBuilder = field(default=None, init=False)
     """venv builder"""
 
-    pip_install_options: ClassVar[tuple[str, ...]] = ("-m", "pip", "install", "--quiet", "--no-warn-script-location", )
+    pip_install_options: ClassVar[tuple[str, ...]] = ("-m", "pip", "install", "--quiet", "--no-warn-script-location",)
     pip_upgrade_options: ClassVar[tuple[str, ...]] = (*pip_install_options, "--upgrade")
 
     def __post_init__(self, data):

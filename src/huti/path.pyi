@@ -213,4 +213,6 @@ class PathStat(NamedTuple):
     suid: bool
     uid: int
     user: str
+
+
 AnyPath: TypeAlias = Path | pathlib.Path | os.PathLike | AnyStr | IO[AnyStr]

@@ -23,6 +23,8 @@ try:
 except ModuleNotFoundError:
     def ic(*a):
         return None if not a else a[0] if len(a) == 1 else a
+
+
     def icc(*a):
         return None if not a else a[0] if len(a) == 1 else a
 

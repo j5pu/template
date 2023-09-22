@@ -89,11 +89,11 @@ from huti.exceptions import CommandNotFound, InvalidArgument
 from huti.typings import AnyPath, ExcType, StrOrBytesPath
 from huti.variables import EXECUTABLE, EXECUTABLE_SITE, PW_ROOT, PW_USER
 
-P = ParamSpec('P')
-T = TypeVar('T')
-_KT = TypeVar('_KT')
-_T = TypeVar('_T')
-_VT = TypeVar('_VT')
+P = ParamSpec("P")
+T = TypeVar("T")
+_KT = TypeVar("_KT")
+_T = TypeVar("_T")
+_VT = TypeVar("_VT")
 _cache_which = {}
 
 
@@ -119,14 +119,14 @@ async def aiocmd(*args, **kwargs) -> subprocess.CompletedProcess:
     Returns:
         None
     """
-    proc = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
-                                                stderr=asyncio.subprocess.PIPE, **kwargs)
+    proc = await asyncio.create_subprocess_exec(
+        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **kwargs
+    )
 
     out, err = await proc.communicate()
-    completed = subprocess.CompletedProcess(args,
-                                            returncode=proc.returncode,
-                                            stdout=out.decode() if out else None,
-                                            stderr=err.decode() if err else None)
+    completed = subprocess.CompletedProcess(
+        args, returncode=proc.returncode, stdout=out.decode() if out else None, stderr=err.decode() if err else None
+    )
     if completed.returncode != 0:
         raise CmdError(completed)
     return completed
@@ -161,8 +161,9 @@ def aioclosed() -> bool:
     return asyncio.get_event_loop().is_closed()
 
 
-async def aiocommand(data: str | list, decode: bool = True, utf8: bool = False,
-                     lines: bool = False) -> subprocess.CompletedProcess:
+async def aiocommand(
+        data: str | list, decode: bool = True, utf8: bool = False, lines: bool = False
+) -> subprocess.CompletedProcess:
     """
     Asyncio run cmd.
 
@@ -175,15 +176,16 @@ async def aiocommand(data: str | list, decode: bool = True, utf8: bool = False,
     Returns:
         CompletedProcess.
     """
-    proc = await asyncio.create_subprocess_shell(data, stdout=asyncio.subprocess.PIPE,
-                                                 stderr=asyncio.subprocess.PIPE, loop=asyncio.get_running_loop())
+    proc = await asyncio.create_subprocess_shell(
+        data, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, loop=asyncio.get_running_loop()
+    )
     out, err = await proc.communicate()
     if decode:
-        out = out.decode().rstrip('.\n')
-        err = err.decode().rstrip('.\n')
+        out = out.decode().rstrip(".\n")
+        err = err.decode().rstrip(".\n")
     elif utf8:
-        out = out.decode('utf8').strip()
-        err = err.decode('utf8').strip()
+        out = out.decode("utf8").strip()
+        err = err.decode("utf8").strip()
 
     out = out.splitlines() if lines else out
 
@@ -330,7 +332,7 @@ def anyin(origin: Iterable, destination: Iterable) -> Any | None:
             return item
 
 
-def brew_bundle(brewfile: Path | str = HUTI_DATA / 'Brewfile', c: Optional[str] = None) -> int:
+def brew_bundle(brewfile: Path | str = HUTI_DATA / "Brewfile", c: Optional[str] = None) -> int:
     """
     Installs brewfile under data directory
 
@@ -345,23 +347,27 @@ def brew_bundle(brewfile: Path | str = HUTI_DATA / 'Brewfile', c: Optional[str] 
     """
 
     if which("brew") and brewfile.exists() and (c is None or not which(c)):
-        return subprocess.check_call([
-            "brew",
-            "bundle",
-            "--no-lock",
-            "--quiet",
-            f"--file={brewfile}",
-        ])
+        return subprocess.check_call(
+            [
+                "brew",
+                "bundle",
+                "--no-lock",
+                "--quiet",
+                f"--file={brewfile}",
+            ]
+        )
 
 
 class _CacheWrapper(Generic[_T]):
     __wrapped__: Callable[..., _T]
 
-    def __call__(self, *args: Any, **kwargs: Any) -> _T | Coroutine[Any, Any, _T]: ...
+    def __call__(self, *args: Any, **kwargs: Any) -> _T | Coroutine[Any, Any, _T]:
+        ...
 
 
-def cache(func: Callable[..., _T | Coroutine[Any, Any, _T]] = ...) -> (
-        Callable[[Callable[..., _T]], _CacheWrapper[_T]] | _T | Coroutine[Any, Any, _T] | Any):
+def cache(
+        func: Callable[..., _T | Coroutine[Any, Any, _T]] = ...
+) -> Callable[[Callable[..., _T]], _CacheWrapper[_T]] | _T | Coroutine[Any, Any, _T] | Any:
     """
     Caches previous calls to the function if object can be encoded.
 
@@ -469,7 +475,7 @@ def cache(func: Callable[..., _T | Coroutine[Any, Any, _T]] = ...) -> (
                 if key in memo:
                     return memo[key]
             except Exception as exception:
-                log.warning('Not cached', func=func, args=args, kwargs=kwargs, exception=exception)
+                log.warning("Not cached", func=func, args=args, kwargs=kwargs, exception=exception)
                 save = False
             value = await func(*args, **kwargs)
             if key and save:
@@ -486,7 +492,7 @@ def cache(func: Callable[..., _T | Coroutine[Any, Any, _T]] = ...) -> (
                 if key in memo:
                     return memo[key]
             except Exception as exception:
-                log.warning('Not cached', func=func, args=args, kwargs=kwargs, exception=exception)
+                log.warning("Not cached", func=func, args=args, kwargs=kwargs, exception=exception)
                 save = False
             value = func(*args, **kwargs)
             if key and save:
@@ -582,8 +588,9 @@ def cmd(*args, **kwargs) -> subprocess.CompletedProcess:
     return completed
 
 
-def cmdrun(data: Iterable, exc: bool = False, lines: bool = True, shell: bool = True, py: bool = False,
-           pysite: bool = True) -> subprocess.CompletedProcess | int | list | str:
+def cmdrun(
+        data: Iterable, exc: bool = False, lines: bool = True, shell: bool = True, py: bool = False, pysite: bool = True
+) -> subprocess.CompletedProcess | int | list | str:
     """
     Runs a cmd.
 
@@ -619,12 +626,12 @@ def cmdrun(data: Iterable, exc: bool = False, lines: bool = True, shell: bool = 
 
     Raises:
         CmdError:
-   """
+    """
     if py:
-        m = '-m'
-        if isinstance(data, str) and data.startswith('/'):
+        m = "-m"
+        if isinstance(data, str) and data.startswith("/"):
             m = ""
-        data = f'{EXECUTABLE_SITE if pysite else EXECUTABLE} {m} {data}'
+        data = f"{EXECUTABLE_SITE if pysite else EXECUTABLE} {m} {data}"
     elif not shell:
         data = toiter(data)
 
@@ -724,77 +731,77 @@ def elementadd(name: str | tuple[str, ...], closing: bool | None = False) -> str
     Returns:
         Str
     """
-    return ''.join(f'<{"/" if closing else ""}{i}>' for i in ((name,) if isinstance(name, str) else name))
+    return "".join(f'<{"/" if closing else ""}{i}>' for i in ((name,) if isinstance(name, str) else name))
 
 
-def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
-                 upgrade: bool = False,
-                 extras: bool = True) -> dict[str, list[packaging.requirements.Requirement]] | str | None:
+def dependencies(
+        data: pathlib.Path | str | None = None, install: bool = False, upgrade: bool = False, extras: bool = True
+) -> dict[str, list[packaging.requirements.Requirement]] | str | None:
     # noinspection PyUnresolvedReferences
     """
-        List or install dependencies for a package from pyproject.toml, project directory (using pytproject.toml)
-            or package name. If package name will search on Distribution
+    List or install dependencies for a package from pyproject.toml, project directory (using pytproject.toml)
+        or package name. If package name will search on Distribution
 
-        Examples:
-            >>> from pathlib import Path
-            >>> import typer
-            >>> import huti
-            >>> from huti.functions import dependencies
-            >>> from huti.functions import requirements
-            >>> from huti.functions import superproject
-            >>>
-            >>> def names(req, k):
-            ...     return [i.name for i in req[k]]
-            >>>
-            >>> def check(req, k, name):
-            ...     assert name in names(req, k)
-            >>>
-            >>> def check_toml(req):
-            ...     check(req, "dependencies", "beautifulsoup4")
-            ...     check(req, "dev", "ipython")
-            ...     check(req, "docs", "sphinx")
-            ...     check(req, "tests", "pytest")
-            >>>
-            >>> def check_typer(req):
-            ...     check(req, "dependencies", "click")
-            ...     check(req, "all", "colorama")
-            ...     check(req, "dev", "flake8")
-            ...     check(req, "doc", "mkdocs")
-            ...     check(req, "test", "pytest")
+    Examples:
+        >>> from pathlib import Path
+        >>> import typer
+        >>> import huti
+        >>> from huti.functions import dependencies
+        >>> from huti.functions import requirements
+        >>> from huti.functions import superproject
+        >>>
+        >>> def names(req, k):
+        ...     return [i.name for i in req[k]]
+        >>>
+        >>> def check(req, k, name):
+        ...     assert name in names(req, k)
+        >>>
+        >>> def check_toml(req):
+        ...     check(req, "dependencies", "beautifulsoup4")
+        ...     check(req, "dev", "ipython")
+        ...     check(req, "docs", "sphinx")
+        ...     check(req, "tests", "pytest")
+        >>>
+        >>> def check_typer(req):
+        ...     check(req, "dependencies", "click")
+        ...     check(req, "all", "colorama")
+        ...     check(req, "dev", "flake8")
+        ...     check(req, "doc", "mkdocs")
+        ...     check(req, "test", "pytest")
 
-            >>> huti_root = supertop(huti.__file__)
-            >>> check_toml(dependencies(huti_root))
-            >>>
-            >>> with chdir(huti_root):
-            ...     check_toml(dependencies("pyproject.toml"))
-            >>>
-            >>> check_toml(dependencies())
-            >>>
-            >>> check_typer(dependencies("typer"))
-            >>>
-            >>> with chdir(parent(typer.__file__)):
-            ...     check_typer(dependencies())
+        >>> huti_root = supertop(huti.__file__)
+        >>> check_toml(dependencies(huti_root))
+        >>>
+        >>> with chdir(huti_root):
+        ...     check_toml(dependencies("pyproject.toml"))
+        >>>
+        >>> check_toml(dependencies())
+        >>>
+        >>> check_typer(dependencies("typer"))
+        >>>
+        >>> with chdir(parent(typer.__file__)):
+        ...     check_typer(dependencies())
 
-        Args:
-            data: pyproject.toml path, package name to search in Distribution or project directory
-                to find pyproject.toml.  If None, the default, will search up for the top
-                of the project pyproject.toml or project name if installed in cwd.
-            install: install requirements, False to list (default: True)
-            upgrade: upgrade requirements (default: False)
-            extras: extras (default: True)
+    Args:
+        data: pyproject.toml path, package name to search in Distribution or project directory
+            to find pyproject.toml.  If None, the default, will search up for the top
+            of the project pyproject.toml or project name if installed in cwd.
+        install: install requirements, False to list (default: True)
+        upgrade: upgrade requirements (default: False)
+        extras: extras (default: True)
 
-        Returns:
-            Requirements or None if install
+    Returns:
+        Requirements or None if install
 
-        Raises:
-            CalledProcessError: if pip install command fails.
-            InvalidArgument: could not find pyproject.toml or should be: pyproject.toml path,
-                package name to search in Distribution or project; directory to add pyproject.toml
-        """
+    Raises:
+        CalledProcessError: if pip install command fails.
+        InvalidArgument: could not find pyproject.toml or should be: pyproject.toml path,
+            package name to search in Distribution or project; directory to add pyproject.toml
+    """
 
     # noinspection PyUnusedLocal
     def quote(d):
-        return [f'"{i}"' if {'>', '<'} & set(i) else i for i in d]
+        return [f'"{i}"' if {">", "<"} & set(i) else i for i in d]
 
     deps, ex, error, read, up = [], {}, None, True, []
 
@@ -804,7 +811,7 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
         if data is None and t.installed:
             data = t.name
         elif data is None:
-            raise InvalidArgument(f'{t=}; could not find pyproject.toml or package name')
+            raise InvalidArgument(f"{t=}; could not find pyproject.toml or package name")
 
     if (pyproject := pathlib.Path(data)).is_file() is False and len(pyproject.parts) == 1:
         requires = importlib.metadata.Distribution.from_name(data).requires
@@ -828,21 +835,26 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
         error = True
 
     if error:
-        raise InvalidArgument(f'{data=}; should be: pyproject.toml path, '
-                              f'package name to search in Distribution or project; directory to add pyproject.toml')
+        raise InvalidArgument(
+            f"{data=}; should be: pyproject.toml path, "
+            f"package name to search in Distribution or project; directory to add pyproject.toml"
+        )
 
     if read:
         conf = toml.load(pyproject)
-        deps = conf['project']['dependencies']
+        deps = conf["project"]["dependencies"]
         if extras:
-            ex = conf['project']['optional-dependencies']
+            ex = conf["project"]["optional-dependencies"]
     if install:
         if upgrade:
-            up = ["--upgrade", ]
+            up = [
+                "--upgrade",
+            ]
         if extras:
             ex = list(ex.values())
-        return subprocess.check_output([sys.executable, "-m", "pip", "install", *up, "-q",
-                                        *(deps + flatten(ex, recurse=True))]).decode()
+        return subprocess.check_output(
+            [sys.executable, "-m", "pip", "install", *up, "-q", *(deps + flatten(ex, recurse=True))]
+        ).decode()
 
     rv = {"dependencies": deps} | ex
     return {key: [packaging.requirements.Requirement(req) for req in value] for key, value in rv.items()}
@@ -851,8 +863,9 @@ def dependencies(data: pathlib.Path | str | None = None, install: bool = False,
 requirements = dependencies
 
 
-def dict_sort(data: dict[_KT, _VT], ordered: bool = False,
-              reverse: bool = False) -> dict[_KT, _VT] | OrderedDict[_KT, _VT]:
+def dict_sort(
+        data: dict[_KT, _VT], ordered: bool = False, reverse: bool = False
+) -> dict[_KT, _VT] | OrderedDict[_KT, _VT]:
     """
     Order a dict based on keys.
 
@@ -900,8 +913,11 @@ def distribution(data: Optional[pathlib.Path | str] = None) -> importlib.metadat
     Returns
         Installed version
     """
-    return suppress(importlib.metadata.Distribution.from_name, data if len(toiter(data, split="/")) == 1 else data.name,
-                    exception=importlib.metadata.PackageNotFoundError)
+    return suppress(
+        importlib.metadata.Distribution.from_name,
+        data if len(toiter(data, split="/")) == 1 else data.name,
+        exception=importlib.metadata.PackageNotFoundError,
+    )
 
 
 def dmg(src: Path | str, dest: Path | str) -> None:
@@ -957,17 +973,12 @@ def exif_rm_tags(file: Path | str):
     """Removes tags with exiftool in pdf"""
     which("exiftool", raises=True)
 
-    subprocess.check_call([
-        "exiftool",
-        "-q", "-q",
-        "-all=",
-        "-overwrite_original",
-        file
-    ])
+    subprocess.check_call(["exiftool", "-q", "-q", "-all=", "-overwrite_original", file])
 
 
-def filterm(d: MutableMapping[_KT, _VT], k: Callable[..., bool] = lambda x: True,
-            v: Callable[..., bool] = lambda x: True) -> MutableMapping[_KT, _VT]:
+def filterm(
+        d: MutableMapping[_KT, _VT], k: Callable[..., bool] = lambda x: True, v: Callable[..., bool] = lambda x: True
+) -> MutableMapping[_KT, _VT]:
     """
     Filter Mutable Mapping.
 
@@ -988,9 +999,12 @@ def filterm(d: MutableMapping[_KT, _VT], k: Callable[..., bool] = lambda x: True
 
 
 # TODO: findup, top, requirements with None, requirements install and upgrade y GitHub Actions
-def findup(path: StrOrBytesPath = None, kind: PathIs = PathIs.IS_FILE,
-           name: str | PathSuffix | pathlib.Path | Callable[..., pathlib.Path] = PathSuffix.ENV.dot,
-           uppermost: bool = False) -> pathlib.Path | None:
+def findup(
+        path: StrOrBytesPath = None,
+        kind: PathIs = PathIs.IS_FILE,
+        name: str | PathSuffix | pathlib.Path | Callable[..., pathlib.Path] = PathSuffix.ENV.dot,
+        uppermost: bool = False,
+) -> pathlib.Path | None:
     """
     Find up if name exists or is file or directory.
 
@@ -1032,8 +1046,15 @@ def findup(path: StrOrBytesPath = None, kind: PathIs = PathIs.IS_FILE,
     Returns:
         Path if found.
     """
-    name = name if isinstance(name, str) else name.name if isinstance(name, pathlib.Path) else name() \
-        if callable(name) else name.value
+    name = (
+        name
+        if isinstance(name, str)
+        else name.name
+        if isinstance(name, pathlib.Path)
+        else name()
+        if callable(name)
+        else name.value
+    )
     start = parent(path or os.getcwd())
     latest = None
     while True:
@@ -1041,7 +1062,7 @@ def findup(path: StrOrBytesPath = None, kind: PathIs = PathIs.IS_FILE,
             if not uppermost:
                 return find
             latest = find
-        if (start := start.parent) == pathlib.Path('/'):
+        if (start := start.parent) == pathlib.Path("/"):
             return latest
 
 
@@ -1067,8 +1088,9 @@ def firstfound(data: Iterable, apply: Callable) -> Any:
             return i
 
 
-def flatten(data: tuple | list | set, recurse: bool = False, unique: bool = False,
-            sort: bool = True) -> tuple | list | set:
+def flatten(
+        data: tuple | list | set, recurse: bool = False, unique: bool = False, sort: bool = True
+) -> tuple | list | set:
     """
     Flattens an Iterable
 
@@ -1094,8 +1116,13 @@ def flatten(data: tuple | list | set, recurse: bool = False, unique: bool = Fals
     cls = data.__class__
 
     flat = []
-    _ = [flat.extend(flatten(item, recurse, unique) if recurse else item)
-         if isinstance(item, list) else flat.append(item) for item in data if item]
+    _ = [
+        flat.extend(flatten(item, recurse, unique) if recurse else item)
+        if isinstance(item, list)
+        else flat.append(item)
+        for item in data
+        if item
+    ]
     value = set(flat) if unique else flat
     if sort:
         try:
@@ -1149,9 +1176,19 @@ def framesimple(data: inspect.FrameInfo | types.FrameType | types.TracebackType)
     function = code.co_name
     v = f_globals | f_locals
     name = v.get("__name__") or function
-    return FrameSimple(back=back, code=code, frame=frame, function=function, globals=f_globals, lineno=lineno,
-                       locals=f_locals, name=name, package=v.get("__package__") or name.split('.')[0],
-                       path=sourcepath(data), vars=v)
+    return FrameSimple(
+        back=back,
+        code=code,
+        frame=frame,
+        function=function,
+        globals=f_globals,
+        lineno=lineno,
+        locals=f_locals,
+        name=name,
+        package=v.get("__package__") or name.split(".")[0],
+        path=sourcepath(data),
+        vars=v,
+    )
 
 
 def from_latin9(*args) -> str:
@@ -1228,8 +1265,9 @@ def getpths() -> dict[str, pathlib.Path] | None:
         names = os.listdir(sitedir)
     except OSError:
         return
-    return {re.sub("(-[0-9].*|.pth)", "", name): pathlib.Path(sitedir / name)
-            for name in names if name.endswith(".pth")}
+    return {
+        re.sub("(-[0-9].*|.pth)", "", name): pathlib.Path(sitedir / name) for name in names if name.endswith(".pth")
+    }
 
 
 def getsitedir(index: bool = 2) -> pathlib.Path:
@@ -1245,13 +1283,12 @@ def getsitedir(index: bool = 2) -> pathlib.Path:
     Returns:
         Path instance with site directory
     """
-    if (sitedir := sys._getframe(index).f_locals.get('sitedir')) is None:
+    if (sitedir := sys._getframe(index).f_locals.get("sitedir")) is None:
         sitedir = sysconfig.get_paths()["purelib"]
     return pathlib.Path(sitedir)
 
 
-def getstdout(func: Callable, *args: Any, ansi: bool = False,
-              new: bool = True, **kwargs: Any) -> str | Iterable[str]:
+def getstdout(func: Callable, *args: Any, ansi: bool = False, new: bool = True, **kwargs: Any) -> str | Iterable[str]:
     """
     Redirect stdout for func output and remove ansi and/or new line.
 
@@ -1299,11 +1336,11 @@ def group_user(name: int | str = USER) -> GroupUser:
         GroupUser.
     """
     if isinstance(name, str):
-        struct = struct if name == (struct := PW_USER).pw_name or name == (
-            struct := PW_ROOT).pw_name else pwd.getpwnam(name)
+        struct = (
+            struct if name == (struct := PW_USER).pw_name or name == (struct := PW_ROOT).pw_name else pwd.getpwnam(name)
+        )
         return GroupUser(group=struct.pw_gid, user=struct.pw_uid)
-    struct = struct if name == (struct := PW_USER).pw_uid or name == (
-        struct := PW_ROOT).pw_uid else pwd.getpwuid(name)
+    struct = struct if name == (struct := PW_USER).pw_uid or name == (struct := PW_ROOT).pw_uid else pwd.getpwuid(name)
     return GroupUser(group=grp.getgrgid(struct.pw_gid).gr_name, user=struct.pw_name)
 
 
@@ -1343,8 +1380,9 @@ def gz(src: Path | str, dest: Path | str = ".") -> Path:
         return (dest / tar.getmembers()[0].name).parent.absolute()
 
 
-def noexc(func: Callable[..., _T], *args: Any, default_: Any = None,
-          exc_: ExcType = Exception, **kwargs: Any) -> _T | Any:
+def noexc(
+        func: Callable[..., _T], *args: Any, default_: Any = None, exc_: ExcType = Exception, **kwargs: Any
+) -> _T | Any:
     """
     Execute function suppressing exceptions.
 
@@ -1390,8 +1428,15 @@ def parent(path: StrOrBytesPath = pathlib.Path(__file__), none: bool = True) -> 
     Returns:
         Path
     """
-    return path.parent if (
-        path := pathlib.Path(path)).is_file() else path if path.is_dir() else None if none else path.parent
+    return (
+        path.parent
+        if (path := pathlib.Path(path)).is_file()
+        else path
+        if path.is_dir()
+        else None
+        if none
+        else path.parent
+    )
 
 
 def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
@@ -1405,8 +1450,11 @@ def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
     Returns:
         True if equals
     """
-    return list(difflib.diff_bytes(difflib.unified_diff, Path(file1).read_bytes().splitlines(),
-                                   Path(file2).read_bytes().splitlines(), n=1))
+    return list(
+        difflib.diff_bytes(
+            difflib.unified_diff, Path(file1).read_bytes().splitlines(), Path(file2).read_bytes().splitlines(), n=1
+        )
+    )
 
 
 def pdf_from_jpeg(file: Path | str, picture: Path | str, rm: bool = True) -> Path:
@@ -1434,17 +1482,15 @@ def pdf_linearize(file: Path | str):
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp = Path(tmpdir) / "tmp.pdf"
-        subprocess.run([
-            "qpdf",
-            '--linearize',
-            file,
-            tmp
-        ])
+        subprocess.run(["qpdf", "--linearize", file, tmp])
         Path(tmp).replace(file)
 
 
-def pdf_reduce(path: Path | str, level: Literal["/default", "/prepress", "ebook", "/screen"] = "/prepress",
-               threshold: int | None = PDF_REDUCE_THRESHOLD):
+def pdf_reduce(
+        path: Path | str,
+        level: Literal["/default", "/prepress", "ebook", "/screen"] = "/prepress",
+        threshold: int | None = PDF_REDUCE_THRESHOLD,
+):
     """
     Compress pdf
 
@@ -1478,17 +1524,19 @@ def pdf_reduce(path: Path | str, level: Literal["/default", "/prepress", "ebook"
     if threshold is None or Path(path).stat().st_size > threshold:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir) / "tmp.pdf"
-            subprocess.check_call([
-                "gs",
-                "-sDEVICE=pdfwrite",
-                "-dCompatibilityLevel=1.4",
-                f"-dPDFSETTINGS={level}",
-                "-dNOPAUSE",
-                "-dQUIET",
-                "-dBATCH",
-                f"-sOutputFile={tmp}",
-                path
-            ])
+            subprocess.check_call(
+                [
+                    "gs",
+                    "-sDEVICE=pdfwrite",
+                    "-dCompatibilityLevel=1.4",
+                    f"-dPDFSETTINGS={level}",
+                    "-dNOPAUSE",
+                    "-dQUIET",
+                    "-dBATCH",
+                    f"-sOutputFile={tmp}",
+                    path,
+                ]
+            )
             Path(tmp).replace(path)
 
 
@@ -1528,39 +1576,43 @@ def pdf_scan(file: Path, directory: Optional[Path] = None) -> Path:
 
     which("convert", raises=True)
 
-    subprocess.check_call([
-        "convert",
-        "-density", "120",
-        file,
-        "-attenuate", "0.4",
-        "+noise", "Gaussian",
-        "-rotate", str(rotate),
-        "-attenuate", "0.03",
-        "+noise", "Uniform",
-        "-sharpen", "0x1.0",
-        dest
-    ])
+    subprocess.check_call(
+        [
+            "convert",
+            "-density",
+            "120",
+            file,
+            "-attenuate",
+            "0.4",
+            "+noise",
+            "Gaussian",
+            "-rotate",
+            str(rotate),
+            "-attenuate",
+            "0.03",
+            "+noise",
+            "Uniform",
+            "-sharpen",
+            "0x1.0",
+            dest,
+        ]
+    )
     return dest
 
 
-def pdf_to_jpeg(file: Path | str, dpi: int = 300) -> Path:
+def pdf_to_picture(file: Path | str, dpi: int = 300, fmt: Literal["jpeg", "png"] = "jpeg") -> Path:
     """Creates a file with jpeg in the same directory from first page of pdf"""
     which("pdftoppm")
 
+    file = Path(file)
+
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp = Path(tmpdir) / "tmp"
-        subprocess.run([
-            "pdftoppm",
-            "-jpeg",
-            "-r",
-            str(dpi),
-            "-singlefile",
-            file,
-            tmp
-        ])
-        if not (dest := Path(tmp).with_suffix(".jpg")).exists():
+        subprocess.run(["pdftoppm", f"-{fmt}", "-r", str(dpi), "-singlefile", file, tmp])
+        suffix = f".{fmt}" if fmt == "png" else ".jpg"
+        if not (dest := tmp.with_suffix(suffix)).exists():
             raise FileNotFoundError(f"File not found {dest}")
-        return shutil.copy(dest, file.with_suffix(".jpg"))
+        return shutil.copy(dest, file.with_suffix(suffix))
 
 
 def python_latest(start: str | int | None = None) -> semver.VersionInfo:
@@ -1642,8 +1694,8 @@ def python_versions() -> list[semver.VersionInfo, ...]:
         Tuple of Python Versions
     """
     rv = []
-    for link in bs4.BeautifulSoup(requests.get(PYTHON_FTP, timeout=2).text, 'html.parser').find_all('a'):
-        if link := re.match(r'((3\.([7-9]|[1-9][0-9]))|4).*', link.get('href').rstrip('/')):
+    for link in bs4.BeautifulSoup(requests.get(PYTHON_FTP, timeout=2).text, "html.parser").find_all("a"):
+        if link := re.match(r"((3\.([7-9]|[1-9][0-9]))|4).*", link.get("href").rstrip("/")):
             rv.append(semver.VersionInfo.parse(link.string))
     return sorted(rv)
 
@@ -1667,7 +1719,7 @@ def request_x_api_key_json(url, key: str = "") -> dict[str, str] | None:
     Returns:
         response json
     """
-    headers = {"headers": {'X-Api-Key': key}} if key else {}
+    headers = {"headers": {"X-Api-Key": key}} if key else {}
     response = requests.get(url, **headers, timeout=2)
     if response.status_code == requests.codes.ok:
         return response.json()
@@ -1799,10 +1851,10 @@ def strip(obj: str | Iterable[str], ansi: bool = False, new: bool = True) -> str
 
     def rv(x):
         if isinstance(x, str):
-            x = x.removesuffix('\n') if new else x
+            x = x.removesuffix("\n") if new else x
             x = strip_ansi.strip_ansi(x) if ansi else x
         if isinstance(x, bytes):
-            x = x.removesuffix(b'\n') if new else x
+            x = x.removesuffix(b"\n") if new else x
         return x
 
     cls = type(obj)
@@ -1950,14 +2002,14 @@ def tardir(src: Path | str) -> Path:
 
     name = Path(src).name + ".tar.gz"
     dest = Path(name)
-    with tarfile.open(dest, 'w:gz') as tar:
+    with tarfile.open(dest, "w:gz") as tar:
         for root, _, files in os.walk(src):
             for file_name in files:
                 tar.add(os.path.join(root, file_name))
         return dest.absolute()
 
 
-def tilde(path: str | Path = '.') -> str:
+def tilde(path: str | Path = ".") -> str:
     """
     Replaces $HOME with ~
 
@@ -1971,7 +2023,7 @@ def tilde(path: str | Path = '.') -> str:
     Returns:
         str
     """
-    return str(path).replace(str(Path.home()), '~')
+    return str(path).replace(str(Path.home()), "~")
 
 
 def timestamp_now(file: Path | str):
@@ -2058,8 +2110,8 @@ def tomodules(obj: Any, suffix: bool = True) -> str:
     Returns:
         String A.B.C
     """
-    split = '/' if isinstance(obj, str) and '/' in obj else ' '
-    return '.'.join(i.removesuffix(Path(i).suffix if suffix else '') for i in toiter(obj, split=split))
+    split = "/" if isinstance(obj, str) and "/" in obj else " "
+    return ".".join(i.removesuffix(Path(i).suffix if suffix else "") for i in toiter(obj, split=split))
 
 
 def top(data: types.ModuleType | StrOrBytesPath | None = None) -> Top:
@@ -2150,13 +2202,18 @@ venv=...)
                 init_py, path = rv, start
             if (rv := start / FileName.PYPROJECT()).is_file():
                 pyproject_toml = rv
-            if any([start.name == 'dist-packages', start.name == 'site-packages',
+            if any(
+                [
+                    start.name == "dist-packages",
+                    start.name == "site-packages",
                     start.name == pathlib.Path(sys.executable).resolve().name,
-                    (start / 'pyvenv.cfg').is_file()]):
+                    (start / "pyvenv.cfg").is_file(),
+                ]
+            ):
                 installed, root = True, start
                 break
             finish = root.parent if root else None
-            if (start := start.parent) == (finish or pathlib.Path('/')):
+            if (start := start.parent) == (finish or pathlib.Path("/")):
                 break
     root = pyproject_toml.parent if root is None and pyproject_toml else path
     if pyproject_toml:
@@ -2171,23 +2228,30 @@ venv=...)
     pths = getpths()
 
     if path:
-        pth_source = pth_source \
-            if (path and (
-                ((pth_source := path / PathSuffix.PTH(name)).is_file()) or
-                ((pth_source := path / PathSuffix.PTH(name.replace("_", "-"))).is_file()))) else None
+        pth_source = (
+            pth_source
+            if (
+                    path
+                    and (
+                            ((pth_source := path / PathSuffix.PTH(name)).is_file())
+                            or ((pth_source := path / PathSuffix.PTH(name.replace("_", "-"))).is_file())
+                    )
+            )
+            else None
+        )
 
     return Top(
         init_py=init_py,
         installed=installed,
         name=name,
         path=path,
-        prefix=f'{name.upper()}_',
+        prefix=f"{name.upper()}_",
         pth=pths.get(name, pths.get(name_dash)),
         pth_source=pathlib.Path(pth_source) if pth_source else None,
         pyproject_toml=pyproject_toml,
         root=root,
         top=t,
-        venv=v
+        venv=v,
     )
 
 
@@ -2239,8 +2303,7 @@ def version(data: types.ModuleType | pathlib.Path | str | None = None) -> str:
     if not name:
         raise InvalidArgument(f"name is required: {data=}")
 
-    return suppress(importlib.metadata.version, name,
-                    exception=importlib.metadata.PackageNotFoundError)
+    return suppress(importlib.metadata.version, name, exception=importlib.metadata.PackageNotFoundError)
 
 
 def which(data="sudo", raises: bool = False) -> str:
@@ -2272,8 +2335,11 @@ def which(data="sudo", raises: bool = False) -> str:
     Returns:
         Cmd path or ""
     """
-    rv = shutil.which(data, mode=os.X_OK) or subprocess.run(
-        f'command -v {data}', shell=True, text=True, capture_output=True).stdout.rstrip('\n') or ''
+    rv = (
+            shutil.which(data, mode=os.X_OK)
+            or subprocess.run(f"command -v {data}", shell=True, text=True, capture_output=True).stdout.rstrip("\n")
+            or ""
+    )
 
     if raises and not rv:
         raise CommandNotFound(data)

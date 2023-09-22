@@ -234,7 +234,7 @@ Test1(a=1, b=2), <....Test4 object at 0x...>)
         """
     rv = ChainRV.UNIQUE
     default = None
-    maps = []  #  noqa: RUF012
+    maps = []  # noqa: RUF012
 
     def __init__(self, *maps, rv=ChainRV.UNIQUE, default=None):
         super().__init__(*maps)
@@ -302,7 +302,7 @@ Test1(a=1, b=2), <....Test4 object at 0x...>)
         del self[key]
         return self
 
-    def __setitem__(self, key, value): # noq: C901
+    def __setitem__(self, key, value):  # noq: C901
         found = False
         for mapping in self.maps:
             if mapping:
@@ -349,13 +349,14 @@ class CmdError(subprocess.CalledProcessError):
         return value
 
 
-
+# noinspection PyTypeChecker
 FileConfig = collections.namedtuple("FileConfig", ("file", "config"))
 
-
+# noinspection PyTypeChecker
 FrameSimple = collections.namedtuple('FrameSimple', 'back code frame function globals lineno locals name '
                                                     'package path vars')
 
+# noinspection PyTypeChecker
 GroupUser = collections.namedtuple('GroupUser', 'group user')
 
 
@@ -373,6 +374,7 @@ class LetterCounter:
         >>> assert c.increment() == 'AA'
 
     """
+
     def __init__(self, start='A'):
         self.current_value = [string.ascii_uppercase.index(v) for v in start[::-1]]
 
@@ -431,4 +433,3 @@ class TempDir(tempfile.TemporaryDirectory):
 
 
 subprocess.CalledProcessError = CalledProcessError
-

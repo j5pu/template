@@ -30,6 +30,7 @@ lint:
 publish: tag
 	@make build
 	@{ [ "$${CI-}" ] || source venv/bin/activate; } && twine upload -u __token__ dist/*
+	@git push --tags --quiet || true
 	@make clean
 
 

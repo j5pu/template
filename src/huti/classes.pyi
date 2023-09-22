@@ -1,4 +1,3 @@
-
 __all__: tuple[str, ...] = ...
 
 import collections
@@ -23,7 +22,7 @@ class CalledProcessError(subprocess.SubprocessError):
     def __init__(self, returncode: int | None = ...,
                  cmd: StrOrBytesPath | Sequence[StrOrBytesPath] | None = ...,
                  output: AnyStr | None = ..., stderr: AnyStr | None = ...,
-                 completed: subprocess.CompletedProcess = ...) -> ...:...
+                 completed: subprocess.CompletedProcess = ...) -> ...: ...
 
     def _message(self): ...
 
@@ -53,9 +52,11 @@ class CmdError(subprocess.CalledProcessError):
 
     def __str__(self) -> str: ...
 
+
 class FileConfig(NamedTuple):
     file: Path
     config: dict
+
 
 class FrameSimple(NamedTuple):
     back: FrameType
@@ -70,9 +71,11 @@ class FrameSimple(NamedTuple):
     path: Path
     vars: dict[str, Any]
 
+
 class GroupUser(NamedTuple):
     group: int | str
     user: int | str
+
 
 class LetterCounter:
     current_value: list[int]
