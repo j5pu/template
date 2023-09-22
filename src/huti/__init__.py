@@ -11,6 +11,7 @@ import huti.functions
 import huti.meta
 import huti.path
 import huti.project
+import huti.pth
 import huti.repo
 import huti.start
 import huti.typings
@@ -27,6 +28,7 @@ from huti.functions import *
 from huti.meta import *
 from huti.path import *
 from huti.project import *
+from huti.pth import *
 from huti.repo import *
 from huti.start import *
 from huti.typings import *
@@ -45,6 +47,7 @@ __all__ = \
     huti.meta.__all__ + \
     huti.path.__all__ + \
     huti.project.__all__ + \
+    huti.pth.__all__ + \
     huti.repo.__all__ + \
     huti.start.__all__ + \
     huti.typings.__all__ + \

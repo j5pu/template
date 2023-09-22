@@ -31,6 +31,7 @@ __all__ = (
     "elementadd",
     "exif_rm_tags",
     "filterm",
+    "find_file",
     "findup",
     "firstfound",
     "flatten",
@@ -80,6 +81,7 @@ import asyncio
 import collections
 import contextlib
 import difflib
+import fnmatch
 import functools
 import getpass
 import grp
@@ -1024,6 +1026,31 @@ def exif_rm_tags(file: Path | str):
     which("exiftool", raises=True)
 
     subprocess.check_call(["exiftool", "-q", "-q", "-all=", "-overwrite_original", file])
+
+
+def find_file(pattern, data: Optional[Path | str] = None) -> list[Path]:
+    """
+    Find file with pattern"
+
+    Examples:
+        >>> from huti.functions import find_file
+        >>>
+        >>> find_file('*.py', )   # doctest: +ELLIPSIS
+        [PosixPath('.../huti/functions.py'), ...
+
+    Args:
+        pattern:
+        data: default cwd
+
+    Returns:
+        list of files found
+    """
+    result = []
+    for root, _, files in os.walk(data or Path.cwd()):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(Path(os.path.join(root, name)))
+    return result
 
 
 def filterm(
