@@ -67,7 +67,7 @@ CLT: Path
 """Command Line Tools /usr directory (xcode-select -p)"""
 
 COMPLETION: Path
-"""BASH completion instalation path"""
+"""BASH completion installation path"""
 
 CONTAINER: bool
 """Running in docker container"""

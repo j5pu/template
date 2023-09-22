@@ -4,27 +4,76 @@ Huti Functions Module
 
 __all__ = (
     "aiocmd",
+    "aioclosed",
+    "aiocommand",
     "aiodmg",
     "aiogz",
+    "aioloop",
+    "aioloopid",
+    "aiorunning",
+    "allin",
     "ami",
+    "anyin",
+    "brew_bundle",
+    "cache",
+    "chdir",
     "cmd",
+    "cmdrun",
     "cmdsudo",
+    "command",
+    "current_task_name",
+    "dependencies",
+    "requirements",
+    "dict_sort",
+    "distribution",
     "dmg",
+    "effect",
     "elementadd",
+    "exif_rm_tags",
+    "filterm",
+    "findup",
+    "firstfound",
+    "flatten",
+    "framesimple",
+    "from_latin9",
+    "fromiter",
+    "getpths",
+    "getsitedir",
     "getstdout",
     "group_user",
     "gz",
     "noexc",
+    "parent",
+    "pdf_diff",
+    "pdf_from_picture",
+    "pdf_linearize",
+    "pdf_reduce",
+    "pdf_scan",
+    "pdf_to_picture",
+    "python_latest",
+    "python_version",
+    "python_versions",
+    "request_x_api_key_json",
+    "sourcepath",
+    "split_pairs",
     "stdout",
     "stdquiet",
     "strip",
+    "superproject",
+    "supertop",
+    "suppress",
     "syssudo",
+    "tag_latest",
     "tardir",
     "tilde",
+    "timestamp_now",
+    "toiter",
+    "to_latin9",
     "tomodules",
+    "top",
+    "tox",
+    "version",
     "which",
-    "PW_USER",
-    "PW_ROOT",
 )
 
 import asyncio
@@ -132,30 +181,6 @@ async def aiocmd(*args, **kwargs) -> subprocess.CompletedProcess:
     return completed
 
 
-async def aiodmg(src: Path | str, dest: Path | str) -> None:
-    """
-    Async Open dmg file and copy the app to dest
-
-    Examples:
-        # >>> await dmg(Path("/tmp/JetBrains.dmg"), Path("/tmp/JetBrains"))
-
-    Args:
-        src: dmg file
-        dest: path to copy to
-
-    Returns:
-        CompletedProcess
-    """
-    with TempDir() as tmpdir:
-        await aiocmd("hdiutil", "attach", "-mountpoint", tmpdir, "-nobrowse", "-quiet", src)
-        for item in src.iterdir():
-            if item.name.endswith(".app"):
-                await aiocmd("cp", "-r", tmpdir / item.name, dest)
-                await aiocmd("xattr", "-r", "-d", "com.apple.quarantine", dest)
-                await aiocmd("hdiutil", "detach", tmpdir, "-force")
-                break
-
-
 def aioclosed() -> bool:
     """check if event loop is closed"""
     return asyncio.get_event_loop().is_closed()
@@ -190,6 +215,30 @@ async def aiocommand(
     out = out.splitlines() if lines else out
 
     return subprocess.CompletedProcess(data, proc.returncode, out, cast(Any, err))
+
+
+async def aiodmg(src: Path | str, dest: Path | str) -> None:
+    """
+    Async Open dmg file and copy the app to dest
+
+    Examples:
+        # >>> await dmg(Path("/tmp/JetBrains.dmg"), Path("/tmp/JetBrains"))
+
+    Args:
+        src: dmg file
+        dest: path to copy to
+
+    Returns:
+        CompletedProcess
+    """
+    with TempDir() as tmpdir:
+        await aiocmd("hdiutil", "attach", "-mountpoint", tmpdir, "-nobrowse", "-quiet", src)
+        for item in src.iterdir():
+            if item.name.endswith(".app"):
+                await aiocmd("cp", "-r", tmpdir / item.name, dest)
+                await aiocmd("xattr", "-r", "-d", "com.apple.quarantine", dest)
+                await aiocmd("hdiutil", "detach", tmpdir, "-force")
+                break
 
 
 async def aiogz(src: Path | str, dest: Path | str = ".") -> Path:
@@ -714,26 +763,6 @@ def current_task_name() -> str:
     return asyncio.current_task().get_name() if aioloop() else ""
 
 
-def elementadd(name: str | tuple[str, ...], closing: bool | None = False) -> str:
-    """
-    Converts to HTML element.
-    >>> from huti.functions import elementadd
-    >>>
-    >>> assert elementadd('light-black') == '<light-black>'
-    >>> assert elementadd('light-black', closing=True) == '</light-black>'
-    >>> assert elementadd(('green', 'bold',)) == '<green><bold>'
-    >>> assert elementadd(('green', 'bold',), closing=True) == '</green></bold>'
-
-    Args:
-        name: text or iterable text.
-        closing: True if closing/end, False if opening/start.
-
-    Returns:
-        Str
-    """
-    return "".join(f'<{"/" if closing else ""}{i}>' for i in ((name,) if isinstance(name, str) else name))
-
-
 def dependencies(
         data: pathlib.Path | str | None = None, install: bool = False, upgrade: bool = False, extras: bool = True
 ) -> dict[str, list[packaging.requirements.Requirement]] | str | None:
@@ -967,6 +996,26 @@ def effect(apply: Callable, *args: Iterable) -> None:
     for arg in toiter(args):
         for item in arg:
             apply(item)
+
+
+def elementadd(name: str | tuple[str, ...], closing: bool | None = False) -> str:
+    """
+    Converts to HTML element.
+    >>> from huti.functions import elementadd
+    >>>
+    >>> assert elementadd('light-black') == '<light-black>'
+    >>> assert elementadd('light-black', closing=True) == '</light-black>'
+    >>> assert elementadd(('green', 'bold',)) == '<green><bold>'
+    >>> assert elementadd(('green', 'bold',), closing=True) == '</green></bold>'
+
+    Args:
+        name: text or iterable text.
+        closing: True if closing/end, False if opening/start.
+
+    Returns:
+        Str
+    """
+    return "".join(f'<{"/" if closing else ""}{i}>' for i in ((name,) if isinstance(name, str) else name))
 
 
 def exif_rm_tags(file: Path | str):
@@ -1317,6 +1366,7 @@ def group_user(name: int | str = USER) -> GroupUser:
         >>> import pathlib
         >>>
         >>> from huti.functions import group_user
+        >>> from huti.variables import PW_USER, PW_ROOT
         >>>
         >>> s = pathlib.Path().stat()
         >>> gr = group_user()
@@ -1457,7 +1507,7 @@ def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
     )
 
 
-def pdf_from_jpeg(file: Path | str, picture: Path | str, rm: bool = True) -> Path:
+def pdf_from_picture(file: Path | str, picture: Path | str, rm: bool = True) -> Path:
     """
     Creates pdf from image
 

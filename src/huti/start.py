@@ -1,3 +1,8 @@
+__all__ = (
+    "CONSOLE",
+)
+
+
 import rich.pretty
 import rich.traceback
 

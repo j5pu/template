@@ -6,6 +6,8 @@ __all__ = (
     "Chain",
     "CmdError",
     "FileConfig",
+    "FrameSimple",
+    "GroupUser",
     "GroupUser",
     "LetterCounter",
     "TempDir",

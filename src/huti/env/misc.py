@@ -2,8 +2,8 @@
 System Environment Variables
 """
 __all__ = (
-  "FORCE_COLOR",
-  "COLORIZE"
+    "FORCE_COLOR",
+    "COLORIZE"
 )
 
 from .main import environment

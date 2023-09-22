@@ -16,7 +16,6 @@ from urllib.parse import ParseResult
 
 
 def parse(variable: str = "USER") -> bool | Path | ParseResult | IPv4Address | IPv6Address | int | str | None:
-
     """
     Parses variable from environment
 

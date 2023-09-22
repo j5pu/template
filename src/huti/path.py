@@ -1578,6 +1578,7 @@ class Passwd:
         return _cache_passwd[0]
 
 
+# noinspection PyTypeChecker
 PathStat = collections.namedtuple('PathStat', 'gid group mode own passwd result root sgid sticky suid uid user')
 PathStat.__doc__ = """
 namedtuple for :func:`ppath.Path.stats`.
