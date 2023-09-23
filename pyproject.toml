@@ -14,6 +14,7 @@ dependencies = [
     "hunter >= 3.6.1, <4",
     "packaging >= 23.1, <24",
     "pillow >= 10.0.0, <11",
+    "pths >= 0.1.0, <1",
     "PyMuPDF >= 1.23.3, <2",
     "pymupdf-fonts >= 1.0.5, <2",
     "requests >= 2.31.0, <3",
@@ -75,6 +76,8 @@ tests = [
 
 [tool.setuptools.packages.find]
 where = ["src"]  # ["."] by default
+include = ["huti"]
+exclude = ["huti.*"]
 namespaces = false
 
 [project.scripts]
@@ -83,23 +86,7 @@ requirements = "huti.cli.dependencies:app"
 huti = "huti.cli.app:app"
 
 [build-system]
-requires = [
-    "beautifulsoup4 >= 4.12.2, <5",
-    "furl >= 2.1.3, <3",
-    "gitpython >= 3.1.36, <4",
-    "jsonpickle >= 3.0.2, <4",
-    "packaging >= 23.1, <24",
-    "PyMuPDF >= 1.23.3, <2",
-    "requests >= 2.31.0, <3",
-    "semver >=3.0.1, <4",
-    "setuptools >= 68.2.2, <69",
-    'setuptools_scm',
-    "strip-ansi >=0.1.1, <1",
-    "structlog >=23.1.0, <24",
-    "toml >=0.10.2, <1",
-    "typer[all] >= 0.9, <1",
-    'wheel'
-]
+requires = ['pths', 'setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]

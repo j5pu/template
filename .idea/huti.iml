@@ -21,6 +21,7 @@
     <orderEntry type="module" module-name="prel" />
     <orderEntry type="module" module-name="turbogit" />
     <orderEntry type="module" module-name="bbin" />
+    <orderEntry type="module" module-name="pths" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />
