@@ -4,8 +4,10 @@ msg := fix: $(shell git status --porcelain | grep -v "^??" | cut -c4- | tr '\n' 
 SHELL := $(shell bash -c 'command -v bash')
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 PYTHONPATH := $(ROOT_DIR)/src
+SUDOC := /usr/bin/sudo
 export msg
 export PYTHONPATH
+export SUDOC
 
 brew:
 	@brew bundle --file=src/huti/data/Brewfile --no-lock --quiet
@@ -15,7 +17,7 @@ build: clean
 
 clean:
 	@sudo rm -rf build dist **/*.egg-info *.egg-info .mypy_cache .pytest_cache .tox **/scanned_*.pdf **/generated_*.pdf \
-		src/pdf/data/Reembolsos ./huti-*  .coverage .ruff_cache
+		 ./huti-*  .coverage .ruff_cache
 
 commit: tests tox
 	@git add -A .

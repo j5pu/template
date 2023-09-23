@@ -13,6 +13,7 @@ dependencies = [
     "jsonpickle >= 3.0.2, <4",
     "hunter >= 3.6.1, <4",
     "pillow >= 10.0.0, <11",
+    "pths >= 0.1.0, <1",
     "PyMuPDF >= 1.23.3, <2",
     "pymupdf-fonts >= 1.0.5, <2",
     "requests >= 2.31.0, <3",
@@ -73,6 +74,9 @@ tests = [
 
 [tool.setuptools.packages.find]
 where = ["src"]  # ["."] by default
+include = ["huti"]
+exclude = ["hut.*i"]
+namespaces = false
 
 [project.scripts]
 dependencies = "huti.cli.dependencies:app"
@@ -80,7 +84,7 @@ requirements = "huti.cli.dependencies:app"
 huti = "huti.cli.app:app"
 
 [build-system]
-requires = ['setuptools', 'setuptools_scm', 'wheel']
+requires = ['pths', 'setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]

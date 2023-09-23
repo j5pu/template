@@ -6,6 +6,7 @@
     <mapping directory="$PROJECT_DIR$/../Archive/bbin" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Archive/turbogit" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../gitp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../pths" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../puntos" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../sitec" vcs="Git" />
   </component>
