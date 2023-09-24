@@ -885,7 +885,7 @@ def dependencies(
             ]
         if extras:
             ex = list(ex.values())
-        executable = VIRTUAL_ENV / "bin/python" if VIRTUAL_ENV and VIRTUAL_ENV.is_dir() else sys.executable
+        executable = v / "bin/python" if (v := pyproject.parent / "venv").is_dir() else sys.executable
         return subprocess.check_output(
             [executable, "-m", "pip", "install", *up, "-q", *(deps + flatten(ex, recurse=True))]
         ).decode()
