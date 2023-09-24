@@ -3,6 +3,7 @@ Huti Functions Module
 """
 
 __all__ = (
+    "exec_module_from_file",
     "aiocmd",
     "aioclosed",
     "aiocommand",
@@ -129,6 +130,7 @@ import semver
 import strip_ansi
 import structlog
 import toml
+from pths import exec_module_from_file as exec_module_from_file
 
 from huti.alias import RunningLoop
 from huti.classes import CalledProcessError, CmdError, FrameSimple, GroupUser, TempDir
@@ -1028,31 +1030,6 @@ def exif_rm_tags(file: Path | str):
     subprocess.check_call(["exiftool", "-q", "-q", "-all=", "-overwrite_original", file])
 
 
-def find_file(pattern, data: Optional[Path | str] = None) -> list[Path]:
-    """
-    Find file with pattern"
-
-    Examples:
-        >>> from huti.functions import find_file
-        >>>
-        >>> find_file('*.py', )   # doctest: +ELLIPSIS
-        [PosixPath('.../huti/functions.py'), ...
-
-    Args:
-        pattern:
-        data: default cwd
-
-    Returns:
-        list of files found
-    """
-    result = []
-    for root, _, files in os.walk(data or Path.cwd()):
-        for name in files:
-            if fnmatch.fnmatch(name, pattern):
-                result.append(Path(os.path.join(root, name)))
-    return result
-
-
 def filterm(
         d: MutableMapping[_KT, _VT], k: Callable[..., bool] = lambda x: True, v: Callable[..., bool] = lambda x: True
 ) -> MutableMapping[_KT, _VT]:
@@ -1073,6 +1050,31 @@ def filterm(
     """
     # noinspection PyArgumentList
     return d.__class__({x: y for x, y in d.items() if k(x) and v(y)})
+
+
+def find_file(pattern, data: Path | str | None = None) -> list[Path]:
+    """
+    Find file with pattern"
+
+    Examples:
+        >>> from huti.functions import find_file
+        >>>
+        >>> find_file('*.py', )   # doctest: +ELLIPSIS
+        [PosixPath('.../huti/__init__.py')...
+
+    Args:
+        pattern:
+        data: default cwd
+
+    Returns:
+        list of files found
+    """
+    result = []
+    for root, _, files in os.walk(data or Path.cwd()):
+        for name in files:
+            if fnmatch.fnmatch(name, pattern):
+                result.append(Path(os.path.join(root, name)))
+    return result
 
 
 # TODO: findup, top, requirements with None, requirements install and upgrade y GitHub Actions

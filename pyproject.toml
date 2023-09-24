@@ -12,6 +12,8 @@ dependencies = [
     "gitpython >= 3.1.36, <4",
     "jsonpickle >= 3.0.2, <4",
     "hunter >= 3.6.1, <4",
+    "loguru >=0.7.2, <1",
+    "loguru-config >=0.1.0, <1",
     "packaging >= 23.1, <24",
     "pillow >= 10.0.0, <11",
     "pths >= 0.1.0, <1",
@@ -74,10 +76,14 @@ tests = [
 "huti.data" = ["**/*.pdf", "Brewfile"]
 "huti" = ["*.pth"]
 
+#[tool.setuptools]
+#package-dir = { "" = "src" }
+#packages = ["huti"]
+##
 [tool.setuptools.packages.find]
 where = ["src"]  # ["."] by default
-include = ["huti"]
-exclude = ["huti.*"]
+exclude = ['huti.cli', 'huti.env', 'huti.data', 'huti.data.generated', 'huti.data.tests', 'huti.data.tests.generated']
+
 namespaces = false
 
 [project.scripts]
