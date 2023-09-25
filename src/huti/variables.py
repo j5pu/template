@@ -45,10 +45,6 @@ HUTI_PROJECT = HUTI_SOURCES.name
 """Huti project name"""
 HUTI_ROOT = HUTI_SOURCES.parent.parent
 """Huti Repository Path"""
-LINUX = sys.platform == "linux"
-"""Is Linux? sys.platform == 'linux'"""
-MACOS = sys.platform == "darwin"
-"""Is macOS? sys.platform == 'darwin'"""
 
 PW_ROOT = pwd.getpwnam("root")
 PW_USER = pwd.getpwnam(os.environ["USER"])

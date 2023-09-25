@@ -30,33 +30,33 @@ dependencies = [
 ]
 [project.optional-dependencies]
 dev = [
-    "black",
+    "black", # pipx
     "icecream",
-    "ipython",
+    "ipython", # pipx
     "ipython-suggestions",
     "restmagic",
     "mypy",
-    "pip-tools",
+    "pip-tools", # pipx
     "pyflyby",
     "python-semantic-release",
-    "ruff",
-    "ruff-lsp",
-    "twine",
+    "ruff", # pipx
+    "ruff-lsp", # pipx
+    "twine", # pipx
     "vendorize"
 ]
 docs = [
-    "docutils",
-    "sphinx",
+    "docutils", # pipx
+    "sphinx", # pipx
     "sphinx-click",
     "sphinx-rtd-theme",
     "sphinxcontrib-napoleon"
 ]
 tests = [
-    "coverage[toml] >=6, <7",
-    "darglint >=1.8.1, <2",
+    "coverage[toml] >=6, <7", # pipx
+    "darglint >=1.8.1, <2", # pipx
     "environs >=9.5.0, <10",
-    "pydocstyle >=6.3, <7",
-    "pytest >=7, <8",
+    "pydocstyle >=6.3, <7", # pipx
+    "pytest >=7, <8", # pipx
     "pytest-asyncio >=0.21.1, <1",
     "pytest-cov >=4, <5",
     "pytest-doctestplus >=0.13, <1",
@@ -68,8 +68,8 @@ tests = [
     "pytest-sugar >=0.9.7, <1",
     "responses==0.21.0",
     "requests-mock >=1.10.0, <2",
-    "ruff >=0.0.282, <0.1",
-    "tox >=4.6.4, <5",
+    "ruff >=0.0.282, <0.1", # pipx
+    "tox >=4.6.4, <5", # pipx
     "types-pytest-lazy-fixture >=0.6.3.3",
 ]
 [tool.setuptools.package-data]

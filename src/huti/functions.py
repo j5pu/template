@@ -4,6 +4,12 @@ Huti Functions Module
 
 __all__ = (
     "exec_module_from_file",
+    "find_file",
+    "parent",
+    "stdout",
+    "superproject",
+    "supertop",
+
     "aiocmd",
     "aioclosed",
     "aiocommand",
@@ -32,7 +38,6 @@ __all__ = (
     "elementadd",
     "exif_rm_tags",
     "filterm",
-    "find_file",
     "findup",
     "firstfound",
     "flatten",
@@ -45,7 +50,6 @@ __all__ = (
     "group_user",
     "gz",
     "noexc",
-    "parent",
     "pdf_diff",
     "pdf_from_picture",
     "pdf_linearize",
@@ -58,11 +62,8 @@ __all__ = (
     "request_x_api_key_json",
     "sourcepath",
     "split_pairs",
-    "stdout",
     "stdquiet",
     "strip",
-    "superproject",
-    "supertop",
     "suppress",
     "syssudo",
     "tag_latest",
@@ -130,7 +131,13 @@ import semver
 import strip_ansi
 import structlog
 import toml
-from pths import exec_module_from_file as exec_module_from_file
+from ppip import command as command
+from ppip import exec_module_from_file as exec_module_from_file
+from ppip import find_file as find_file
+from ppip import parent as parent
+from ppip import stdout as stdout
+from ppip import superproject as superproject
+from ppip import supertop as supertop
 
 from huti.alias import RunningLoop
 from huti.classes import CalledProcessError, CmdError, FrameSimple, GroupUser, TempDir
@@ -385,32 +392,6 @@ def anyin(origin: Iterable, destination: Iterable) -> Any | None:
             return item
 
 
-def brew_bundle(brewfile: Path | str = HUTI_DATA / "Brewfile", c: Optional[str] = None) -> int:
-    """
-    Installs brewfile under data directory
-
-    Examples:
-        >>> from huti.functions import brew_bundle
-        >>> assert brew_bundle() == 0
-        >>> assert brew_bundle(c="convert") is None
-
-    Args:
-        brewfile: brewfile to install
-        c: command that needs to be absent to run brew bundle
-    """
-
-    if which("brew") and brewfile.exists() and (c is None or not which(c)):
-        return subprocess.check_call(
-            [
-                "brew",
-                "bundle",
-                "--no-lock",
-                "--quiet",
-                f"--file={brewfile}",
-            ]
-        )
-
-
 class _CacheWrapper(Generic[_T]):
     __wrapped__: Callable[..., _T]
 
@@ -553,65 +534,6 @@ def cache(
             return value
     return wrapper
 
-
-@contextlib.contextmanager
-def chdir(data: StrOrBytesPath | bool = True) -> Iterable[tuple[pathlib.Path, pathlib.Path]]:
-    """
-    Change directory and come back to previous directory.
-
-    Examples:
-        # FIXME: Ubuntu
-        >>> from pathlib import Path
-        >>> from huti.functions import chdir
-        >>> from huti.variables import MACOS
-        >>>
-        >>> previous = Path.cwd()
-        >>> new = Path('/usr/local')
-        >>> with chdir(new) as (p, n):
-        ...     assert previous == p
-        ...     assert new == n
-        ...     assert n == Path.cwd()
-        >>>
-        >>> new = Path('/bin/ls')
-        >>> with chdir(new) as (p, n):
-        ...     assert previous == p
-        ...     assert new.parent == n
-        ...     assert n == Path.cwd()
-        >>>
-        >>> new = Path('/bin/foo')
-        >>> with chdir(new) as (p, n):
-        ...     assert previous == p
-        ...     assert new.parent == n
-        ...     assert n == Path.cwd()
-        >>>
-        >>> with chdir() as (p, n):
-        ...     assert previous == p
-        ...     if MACOS
-        ...         assert "var" in str(n)
-        ...     assert n == Path.cwd() # doctest: +SKIP
-
-    Args:
-        data: directory or parent if file or True for temp directory
-
-    Returns:
-        Old directory and new directory
-    """
-
-    def y(new):
-        os.chdir(new)
-        return oldpwd, new
-
-    oldpwd = pathlib.Path.cwd()
-    try:
-        if data is True:
-            with TempDir() as tmp:
-                yield y(tmp)
-        else:
-            yield y(parent(data, none=False))
-    finally:
-        os.chdir(oldpwd)
-
-
 def cmd(*args, **kwargs) -> subprocess.CompletedProcess:
     """
     Exec Command
@@ -727,39 +649,6 @@ def cmdsudo(*args, user: str = "root", **kwargs) -> subprocess.CompletedProcess 
     if not ami(user):
         return cmd(["sudo", "-u", user, *args], **kwargs)
     return None
-
-
-def command(*args, **kwargs) -> subprocess.CompletedProcess:
-    """
-    Exec Command with the following defaults compared to :func:`subprocess.run`:
-
-        - capture_output=True
-        - text=True
-        - check=True
-
-    Examples:
-        >>> from huti.classes import TempDir
-        >>> with TempDir() as tmp:
-        ...     rv = command("git", "clone", "https://github.com/octocat/Hello-World.git", tmp)
-        ...     assert rv.returncode == 0
-        ...     assert (tmp / ".git").exists()
-
-    Args:
-        *args: command and args
-        **kwargs: `subprocess.run` kwargs
-
-    Raises:
-        CmdError
-
-    Returns:
-        None
-    """
-
-    completed = subprocess.run(args, **kwargs, capture_output=True, text=True)
-
-    if completed.returncode != 0:
-        raise CalledProcessError(completed=completed)
-    return completed
 
 
 def current_task_name() -> str:
@@ -1051,99 +940,7 @@ def filterm(
     # noinspection PyArgumentList
     return d.__class__({x: y for x, y in d.items() if k(x) and v(y)})
 
-
-def find_file(pattern, data: Path | str | None = None) -> list[Path]:
-    """
-    Find file with pattern"
-
-    Examples:
-        >>> from huti.functions import find_file
-        >>>
-        >>> find_file('*.py', )   # doctest: +ELLIPSIS
-        [PosixPath('.../huti/__init__.py')...
-
-    Args:
-        pattern:
-        data: default cwd
-
-    Returns:
-        list of files found
-    """
-    result = []
-    for root, _, files in os.walk(data or Path.cwd()):
-        for name in files:
-            if fnmatch.fnmatch(name, pattern):
-                result.append(Path(os.path.join(root, name)))
-    return result
-
-
 # TODO: findup, top, requirements with None, requirements install and upgrade y GitHub Actions
-def findup(
-        path: StrOrBytesPath = None,
-        kind: PathIs = PathIs.IS_FILE,
-        name: str | PathSuffix | pathlib.Path | Callable[..., pathlib.Path] = PathSuffix.ENV.dot,
-        uppermost: bool = False,
-) -> pathlib.Path | None:
-    """
-    Find up if name exists or is file or directory.
-
-    Examples:
-        >>> import email.mime.application
-        >>> from pathlib import Path
-        >>> import huti
-        >>> import huti.cli
-        >>> from huti.enums import PathSuffix, FileName
-        >>> from huti.functions import chdir, findup, parent
-        >>>
-        >>>
-        >>> file = Path(email.mime.application.__file__)
-        >>>
-        >>> with chdir(parent(huti.__file__)):
-        ...     pyproject_toml = findup(huti.__file__, name=FileName.PYPROJECT())
-        ...     assert pyproject_toml.is_file()
-        >>>
-        >>> with chdir(parent(huti.cli.__file__)):
-        ...     cli_init_py = findup(name=FileName.INIT())
-        ...     assert cli_init_py.is_file()
-        ...     assert cli_init_py == Path(huti.cli.__file__)
-        ...     huti_init_py = findup(name=FileName.INIT(), uppermost=True)
-        ...     assert huti_init_py.is_file()
-        ...     assert huti_init_py == Path(huti.__file__)
-        >>>
-        >>> assert findup(kind=PathIs.IS_DIR, name=huti.__name__) == Path(huti.__name__).parent.resolve()
-        >>>
-        >>> assert findup(file, kind=PathIs.EXISTS, name=FileName.INIT()) == file.parent / FileName.INIT()
-        >>> assert findup(file, name=FileName.INIT()) == file.parent / FileName.INIT()
-        >>> assert findup(file, name=FileName.INIT(), uppermost=True) == file.parent.parent / FileName.INIT()
-
-    Args:
-        path: CWD if None or Path.
-        kind: Exists, file or directory.
-        name: File or directory name.
-        uppermost: Find uppermost found if True (return the latest found if more than one) or first if False.
-
-    Returns:
-        Path if found.
-    """
-    name = (
-        name
-        if isinstance(name, str)
-        else name.name
-        if isinstance(name, pathlib.Path)
-        else name()
-        if callable(name)
-        else name.value
-    )
-    start = parent(path or os.getcwd())
-    latest = None
-    while True:
-        if getattr(find := start / name, kind.value)():
-            if not uppermost:
-                return find
-            latest = find
-        if (start := start.parent) == pathlib.Path("/"):
-            return latest
-
 
 def firstfound(data: Iterable, apply: Callable) -> Any:
     """
@@ -1325,48 +1122,6 @@ def fromiter(data, *args):
     value = {k: [getattr(C, k) for C in data if hasattr(C, k)] for i in args for k in toiter(i)}
     return {k: v for k, v in value.items() if v}
 
-
-def getpths() -> dict[str, pathlib.Path] | None:
-    """
-    Get list of pths under ``sitedir``
-
-    Examples:
-        >>> from huti.functions import getpths
-        >>>
-        >>> pths = getpths()
-        >>> assert "distutils-precedence" in pths
-
-    Returns:
-        Dictionary with pth name and file
-    """
-    try:
-        sitedir = getsitedir()
-        names = os.listdir(sitedir)
-    except OSError:
-        return
-    return {
-        re.sub("(-[0-9].*|.pth)", "", name): pathlib.Path(sitedir / name) for name in names if name.endswith(".pth")
-    }
-
-
-def getsitedir(index: bool = 2) -> pathlib.Path:
-    """Get site directory from stack if imported by :mod:`site` in a ``.pth``file or :mod:`sysconfig`
-
-    Examples:
-        >>> from huti.functions import getsitedir
-        >>> assert "packages" in str(getsitedir())
-
-    Args:
-        index: 1 if directly needed by this function (default: 2), for caller to this function
-
-    Returns:
-        Path instance with site directory
-    """
-    if (sitedir := sys._getframe(index).f_locals.get("sitedir")) is None:
-        sitedir = sysconfig.get_paths()["purelib"]
-    return pathlib.Path(sitedir)
-
-
 def getstdout(func: Callable, *args: Any, ansi: bool = False, new: bool = True, **kwargs: Any) -> str | Iterable[str]:
     """
     Redirect stdout for func output and remove ansi and/or new line.
@@ -1484,40 +1239,6 @@ def noexc(
         return func(*args, **kwargs)
     except exc_:
         return default_
-
-
-def parent(path: StrOrBytesPath = pathlib.Path(__file__), none: bool = True) -> pathlib.Path | None:
-    """
-    Parent if File or None if it does not exist.
-
-    Examples:
-        >>> from huti.functions import parent
-        >>>
-        >>> parent("/bin/ls")
-        PosixPath('/bin')
-        >>> parent("/bin")
-        PosixPath('/bin')
-        >>> parent("/bin/foo", none=False)
-        PosixPath('/bin')
-        >>> parent("/bin/foo")
-
-    Args:
-        path: file or dir.
-        none: return None if it is not a directory and does not exist (default: True)
-
-    Returns:
-        Path
-    """
-    return (
-        path.parent
-        if (path := pathlib.Path(path)).is_file()
-        else path
-        if path.is_dir()
-        else None
-        if none
-        else path.parent
-    )
-
 
 def pdf_diff(file1: Path | str, file2: Path | str) -> list[bytes]:
     """
@@ -1854,44 +1575,6 @@ def split_pairs(text):
     return list(zip(text[0::2], text[1::2]))
 
 
-def stdout(shell: AnyStr, keepends: bool = False, split: bool = False) -> list[str] | str | None:
-    """Return stdout of executing cmd in a shell or None if error.
-
-    Execute the string 'cmd' in a shell with 'subprocess.getstatusoutput' and
-    return a stdout if success. The locale encoding is used
-    to decode the output and process newlines.
-
-    A trailing newline is stripped from the output.
-
-    Examples:
-        >>> from huti.functions import stdout
-        >>>
-        >>> stdout("ls /bin/ls")
-        '/bin/ls'
-        >>> stdout("true")
-        ''
-        >>> stdout("ls foo")
-        >>> stdout("ls /bin/ls", split=True)
-        ['/bin/ls']
-
-    Args:
-        shell: command to be executed
-        keepends: line breaks when ``split`` if true, are not included in the resulting list unless keepends
-            is given and true.
-        split: return a list of the stdout lines in the string, breaking at line boundaries.(default: False)
-
-    Returns:
-        Stdout or None if error.
-    """
-
-    exitcode, data = subprocess.getstatusoutput(shell)
-
-    if exitcode == 0:
-        if split:
-            return data.splitlines(keepends=keepends)
-        return data
-    return None
-
 
 @contextlib.contextmanager
 def stdquiet() -> tuple[TextIO, TextIO]:
@@ -1941,58 +1624,6 @@ def strip(obj: str | Iterable[str], ansi: bool = False, new: bool = True) -> str
     if isinstance(obj, str):
         return rv(obj)
     return cls(rv(i) for i in obj)
-
-
-def superproject(path: pathlib.Path | str = "") -> pathlib.Path | None:
-    """
-    Show the absolute resolved path of the root of the superproject's working tree (if exists) that uses the current
-    repository as its submodule (--show-superproject-working-tree) or show the absolute path of the
-    top-level directory of the working tree (--show-toplevel).
-
-    Exmples:
-        >>> import os
-        >>> import pathlib
-        >>> import huti
-        >>> from huti.classes import TempDir
-        >>> from huti.functions import chdir
-        >>> from huti.functions import superproject
-        >>> from huti.functions import supertop
-        >>> from huti.functions import command
-        >>>
-        >>> supertop(huti.__file__)  # doctest: +ELLIPSIS
-        PosixPath('.../huti')
-        >>>
-        >>> with TempDir() as tmp:
-        ...     if "site-packages" not in __file__:
-        ...         assert superproject() == pathlib.Path(huti.__file__).parent.parent.parent
-        ...     assert superproject(tmp) is None
-        ...     rv = command("git", "clone", "https://github.com/octocat/Hello-World.git", tmp)
-        ...     assert rv.returncode == 0
-        ...     assert superproject(tmp) == tmp.resolve()
-        ...     assert superproject(tmp / "README") == tmp.resolve()
-        ...     rv = command("git", "submodule", "add", "https://github.com/octocat/Hello-World.git", cwd=tmp)
-        ...     assert rv.returncode == 0
-        ...     assert (tmp / ".git").exists()
-        ...     assert (tmp / ".git").is_dir()
-        ...     with chdir(tmp):
-        ...         assert superproject() == tmp.resolve()
-        ...     with chdir(tmp /"Hello-World"):
-        ...         assert superproject() == tmp.resolve()
-        ...         assert superproject(tmp / "Hello-World/README") == tmp.resolve()
-
-    Args:
-        path: path inside working tree
-
-    Returns:
-        top repository absolute resolved path
-    """
-    c = f"git -C {parent(path, none=False)} rev-parse --show-superproject-working-tree --show-toplevel"
-    if output := stdout(c, split=True):
-        return pathlib.Path(output[0])
-
-
-supertop = superproject
-
 
 def suppress(func: Callable[P, T], *args: P.args, exception: ExcType | None = Exception, **kwargs: P.kwargs) -> T:
     """
@@ -2110,40 +1741,6 @@ def timestamp_now(file: Path | str):
     """set modified and create date of file to now"""
     now = time.time()
     os.utime(file, (now, now))
-
-
-def toiter(obj: Any, always: bool = False, split: str = " ") -> Any:
-    """
-    To iter.
-
-    Examples:
-        >>> import pathlib
-        >>> from huti.functions import toiter
-        >>>
-        >>> assert toiter('test1') == ['test1']
-        >>> assert toiter('test1 test2') == ['test1', 'test2']
-        >>> assert toiter({'a': 1}) == {'a': 1}
-        >>> assert toiter({'a': 1}, always=True) == [{'a': 1}]
-        >>> assert toiter('test1.test2') == ['test1.test2']
-        >>> assert toiter('test1.test2', split='.') == ['test1', 'test2']
-        >>> assert toiter(pathlib.Path("/tmp/foo")) == ('/', 'tmp', 'foo')
-
-    Args:
-        obj: obj.
-        always: return any iterable into a list.
-        split: split for str.
-
-    Returns:
-        Iterable.
-    """
-    if isinstance(obj, str):
-        obj = obj.split(split)
-    elif hasattr(obj, "parts"):
-        obj = obj.parts
-    elif not isinstance(obj, Iterable) or always:
-        obj = [obj]
-    return obj
-
 
 def to_latin9(chars: str) -> str:
     """
@@ -2385,43 +1982,3 @@ def version(data: types.ModuleType | pathlib.Path | str | None = None) -> str:
 
     return suppress(importlib.metadata.version, name, exception=importlib.metadata.PackageNotFoundError)
 
-
-def which(data="sudo", raises: bool = False) -> str:
-    """
-    Checks if cmd or path is executable or exported bash function.
-
-    Examples:
-        # FIXME: Ubuntu
-
-        >>> from huti.functions import which
-        >>> if which():
-        ...    assert "sudo" in which()
-        >>> assert which('/usr/local') == ''
-        >>> assert which('/usr/bin/python3') == '/usr/bin/python3'
-        >>> assert which('let') == 'let'
-        >>> assert which('source') == 'source'
-        >>> which("foo", raises=True) # doctest: +IGNORE_EXCEPTION_DETAIL
-        Traceback (most recent call last):
-        huti.exceptions.CommandNotFound: foo
-
-    Attribute:
-        data: command or path.
-        raises: raise exception if command not found
-
-    Raises:
-        CommandNotFound:
-
-
-    Returns:
-        Cmd path or ""
-    """
-    rv = (
-            shutil.which(data, mode=os.X_OK)
-            or subprocess.run(f"command -v {data}", shell=True, text=True, capture_output=True).stdout.rstrip("\n")
-            or ""
-    )
-
-    if raises and not rv:
-        raise CommandNotFound(data)
-
-    return rv
