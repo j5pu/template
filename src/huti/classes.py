@@ -230,35 +230,11 @@ Test1(a=1, b=2), <....Test4 object at 0x...>)
         return self.__setitem__(key, value)
 
 
-class CmdError(subprocess.CalledProcessError):
-    """
-    Raised when run() and the process returns a non-zero exit status.
-
-    Attribute:
-      process: The CompletedProcess object returned by run().
-    """
-
-    def __init__(self, process=None):
-        super().__init__(process.returncode, process.args, output=process.stdout, stderr=process.stderr)
-
-    def __str__(self):
-        value = super().__str__()
-        if self.stderr is not None:
-            value += "\n" + self.stderr
-        if self.stdout is not None:
-            value += "\n" + self.stdout
-        return value
-
-
 # noinspection PyTypeChecker
-FileConfig = collections.namedtuple("FileConfig", ("file", "config"))
 
 # noinspection PyTypeChecker
 FrameSimple = collections.namedtuple('FrameSimple', 'back code frame function globals lineno locals name '
                                                     'package path vars')
-
-# noinspection PyTypeChecker
-GroupUser = collections.namedtuple('GroupUser', 'group user')
 
 
 class LetterCounter:
@@ -308,6 +284,3 @@ class LetterCounter:
                     break
         # Form the string and return
         return ''.join(reversed([string.ascii_uppercase[i] for i in self.current_value]))
-
-
-subprocess.CalledProcessError = CalledProcessError

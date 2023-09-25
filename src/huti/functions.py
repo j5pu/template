@@ -10,7 +10,6 @@ __all__ = (
     "superproject",
     "supertop",
 
-    "aiocmd",
     "aioclosed",
     "aiocommand",
     "aiodmg",
@@ -21,10 +20,8 @@ __all__ = (
     "allin",
     "ami",
     "anyin",
-    "brew_bundle",
     "cache",
     "chdir",
-    "cmd",
     "cmdrun",
     "cmdsudo",
     "command",
@@ -149,83 +146,19 @@ from huti.exceptions import CommandNotFound, InvalidArgument
 from huti.typings import AnyPath, ExcType, StrOrBytesPath
 from huti.variables import EXECUTABLE, EXECUTABLE_SITE, PW_ROOT, PW_USER
 
-P = ParamSpec("P")
-T = TypeVar("T")
+
 _KT = TypeVar("_KT")
 _T = TypeVar("_T")
 _VT = TypeVar("_VT")
 _cache_which = {}
 
 
-async def aiocmd(*args, **kwargs) -> subprocess.CompletedProcess:
-    """
-    Async Exec Command
-
-    Examples:
-        >>> import asyncio
-        >>> from huti.classes import TempDir
-        >>> with TempDir() as tmp:
-        ...     rv = asyncio.run(aiocmd("git", "clone", "https://github.com/octocat/Hello-World.git", cwd=tmp))
-        ...     assert rv.returncode == 0
-        ...     assert (tmp / "Hello-World" / "README").exists()
-
-    Args:
-        *args: command and args
-        **kwargs: subprocess.run kwargs
-
-    Raises:
-        JetBrainsError
-
-    Returns:
-        None
-    """
-    proc = await asyncio.create_subprocess_exec(
-        *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **kwargs
-    )
-
-    out, err = await proc.communicate()
-    completed = subprocess.CompletedProcess(
-        args, returncode=proc.returncode, stdout=out.decode() if out else None, stderr=err.decode() if err else None
-    )
-    if completed.returncode != 0:
-        raise CmdError(completed)
-    return completed
 
 
 def aioclosed() -> bool:
     """check if event loop is closed"""
     return asyncio.get_event_loop().is_closed()
 
-
-async def aiocommand(
-        data: str | list, decode: bool = True, utf8: bool = False, lines: bool = False
-) -> subprocess.CompletedProcess:
-    """
-    Asyncio run cmd.
-
-    Args:
-        data: command.
-        decode: decode and strip output.
-        utf8: utf8 decode.
-        lines: split lines.
-
-    Returns:
-        CompletedProcess.
-    """
-    proc = await asyncio.create_subprocess_shell(
-        data, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, loop=asyncio.get_running_loop()
-    )
-    out, err = await proc.communicate()
-    if decode:
-        out = out.decode().rstrip(".\n")
-        err = err.decode().rstrip(".\n")
-    elif utf8:
-        out = out.decode("utf8").strip()
-        err = err.decode("utf8").strip()
-
-    out = out.splitlines() if lines else out
-
-    return subprocess.CompletedProcess(data, proc.returncode, out, cast(Any, err))
 
 
 async def aiodmg(src: Path | str, dest: Path | str) -> None:
@@ -335,27 +268,6 @@ def allin(origin: Iterable, destination: Iterable) -> bool:
     origin = toiter(origin)
     destination = toiter(destination)
     return all(x in destination for x in origin)
-
-
-def ami(user: str = "root") -> bool:
-    """
-    Check if Current User is User in Argument (default: root)
-
-    Examples:
-        >>> from huti.functions import ami
-        >>>
-        >>> ami(os.getenv("USER"))
-        True
-        >>> ami()
-        False
-
-    Arguments:
-        user: to check against current user (Default: False)
-
-    Returns:
-        CompletedProcess if the current user is not the same as user, None otherwise
-    """
-    return os.getuid() == pwd.getpwnam(user or getpass.getuser()).pw_uid
 
 
 def anyin(origin: Iterable, destination: Iterable) -> Any | None:
@@ -534,256 +446,13 @@ def cache(
             return value
     return wrapper
 
-def cmd(*args, **kwargs) -> subprocess.CompletedProcess:
-    """
-    Exec Command
-
-    Examples:
-        >>> from huti.classes import TempDir
-        >>> with TempDir() as tmp:
-        ...     rv = cmd("git", "clone", "https://github.com/octocat/Hello-World.git", tmp)
-        ...     assert rv.returncode == 0
-        ...     assert (tmp / "README").exists()
-
-    Args:
-        *args: command and args
-        **kwargs: subprocess.run kwargs
-
-    Raises:
-        CmdError
-
-    Returns:
-        None
-    """
-
-    completed = subprocess.run(args, **kwargs, capture_output=True, text=True)
-
-    if completed.returncode != 0:
-        raise CmdError(completed)
-    return completed
 
 
-def cmdrun(
-        data: Iterable, exc: bool = False, lines: bool = True, shell: bool = True, py: bool = False, pysite: bool = True
-) -> subprocess.CompletedProcess | int | list | str:
-    """
-    Runs a cmd.
-
-    Examples:
-        >>> import huti
-        >>> from huti.functions import cmdrun
-        >>> from huti.functions import tox
-        >>>
-        >>> cmdrun('ls a')  # doctest: +ELLIPSIS
-        CompletedProcess(args='ls a', returncode=..., stdout=[], stderr=[...])
-        >>> assert 'Requirement already satisfied' in cmdrun('pip install pip', py=True).stdout[0]
-        >>> cmdrun('ls a', shell=False, lines=False)  # doctest: +ELLIPSIS
-        CompletedProcess(args=['ls', 'a'], returncode=..., stdout='', stderr=...)
-        >>> cmdrun('echo a', lines=False)  # Extra '\' added to avoid docstring error.
-        CompletedProcess(args='echo a', returncode=0, stdout='a\\n', stderr='')
-        >>> assert "venv" not in cmdrun("sysconfig", py=True, lines=False).stdout
-        >>> if not tox:
-        ...     import sysconfig; print(sysconfig.get_paths())
-        ...     print("No tox")
-        ...     print(__file__)
-        ...     assert "venv" in cmdrun("sysconfig", py=True, pysite=False, lines=False).stdout
-
-    Args:
-        data: command.
-        exc: raise exception.
-        lines: split lines so ``\\n`` is removed from all lines (extra '\' added to avoid docstring error).
-        py: runs with python executable.
-        shell: expands shell variables and one line (shell True expands variables in shell).
-        pysite: run on site python if running on a VENV.
-
-    Returns:
-        Union[CompletedProcess, int, list, str]: Completed process output.
-
-    Raises:
-        CmdError:
-    """
-    if py:
-        m = "-m"
-        if isinstance(data, str) and data.startswith("/"):
-            m = ""
-        data = f"{EXECUTABLE_SITE if pysite else EXECUTABLE} {m} {data}"
-    elif not shell:
-        data = toiter(data)
-
-    text = not lines
-
-    proc = subprocess.run(data, shell=shell, capture_output=True, text=text)
-
-    def std(out=True):
-        if out:
-            if lines:
-                return proc.stdout.decode("utf-8").splitlines()
-            else:
-                # return proc.stdout.rstrip('.\n')
-                return proc.stdout
-        else:
-            if lines:
-                return proc.stderr.decode("utf-8").splitlines()
-            else:
-                # return proc.stderr.decode("utf-8").rstrip('.\n')
-                return proc.stderr
-
-    rv = subprocess.CompletedProcess(proc.args, proc.returncode, std(), std(False))
-    if rv.returncode != 0 and exc:
-        raise CmdError(rv)
-    return rv
-
-
-def cmdsudo(*args, user: str = "root", **kwargs) -> subprocess.CompletedProcess | None:
-    """
-    Run Program with sudo if user is different that the current user
-
-    Arguments:
-        *args: command and args to run
-        user: run as user (Default: False)
-        **kwargs: subprocess.run kwargs
-
-    Returns:
-        CompletedProcess if the current user is not the same as user, None otherwise
-    """
-    if not ami(user):
-        return cmd(["sudo", "-u", user, *args], **kwargs)
-    return None
 
 
 def current_task_name() -> str:
     """Current asyncio task name"""
     return asyncio.current_task().get_name() if aioloop() else ""
-
-
-def dependencies(
-        data: pathlib.Path | str | None = None, install: bool = False, upgrade: bool = False, extras: bool = True
-) -> dict[str, list[packaging.requirements.Requirement]] | str | None:
-    # noinspection PyUnresolvedReferences
-    """
-    List or install dependencies for a package from pyproject.toml, project directory (using pytproject.toml)
-        or package name. If package name will search on Distribution
-
-    Examples:
-        >>> from pathlib import Path
-        >>> import typer
-        >>> import huti
-        >>> from huti.functions import dependencies
-        >>> from huti.functions import requirements
-        >>> from huti.functions import superproject
-        >>>
-        >>> def names(req, k):
-        ...     return [i.name for i in req[k]]
-        >>>
-        >>> def check(req, k, name):
-        ...     assert name in names(req, k)
-        >>>
-        >>> def check_toml(req):
-        ...     check(req, "dependencies", "beautifulsoup4")
-        ...     check(req, "dev", "ipython")
-        ...     check(req, "docs", "sphinx")
-        ...     check(req, "tests", "pytest")
-        >>>
-        >>> def check_typer(req):
-        ...     check(req, "dependencies", "click")
-        ...     check(req, "all", "colorama")
-        ...     check(req, "dev", "flake8")
-        ...     check(req, "doc", "mkdocs")
-        ...     check(req, "test", "pytest")
-
-        >>> huti_root = supertop(huti.__file__)
-        >>> check_toml(dependencies(huti_root))
-        >>>
-        >>> with chdir(huti_root):
-        ...     check_toml(dependencies("pyproject.toml"))
-        >>>
-        >>> check_toml(dependencies())
-        >>>
-        >>> check_typer(dependencies("typer"))
-        >>>
-        >>> with chdir(parent(typer.__file__)):
-        ...     check_typer(dependencies())
-
-    Args:
-        data: pyproject.toml path, package name to search in Distribution or project directory
-            to find pyproject.toml.  If None, the default, will search up for the top
-            of the project pyproject.toml or project name if installed in cwd.
-        install: install requirements, False to list (default: True)
-        upgrade: upgrade requirements (default: False)
-        extras: extras (default: True)
-
-    Returns:
-        Requirements or None if install
-
-    Raises:
-        CalledProcessError: if pip install command fails.
-        InvalidArgument: could not find pyproject.toml or should be: pyproject.toml path,
-            package name to search in Distribution or project; directory to add pyproject.toml
-    """
-
-    # noinspection PyUnusedLocal
-    def quote(d):
-        return [f'"{i}"' if {">", "<"} & set(i) else i for i in d]
-
-    deps, ex, error, read, up = [], {}, None, True, []
-
-    if data is None:
-        t = top()
-        data = top().pyproject_toml
-        if data is None and t.installed:
-            data = t.name
-        elif data is None:
-            raise InvalidArgument(f"{t=}; could not find pyproject.toml or package name")
-
-    if (pyproject := pathlib.Path(data)).is_file() is False and len(pyproject.parts) == 1:
-        requires = importlib.metadata.Distribution.from_name(data).requires
-        for item in requires:
-            if "; extra" in item:
-                values = item.split(" ; extra == ")
-                key = values[1].replace('"', "")
-                if key not in ex:
-                    ex[key] = []
-                ex[key].append(values[0])
-            else:
-                deps.append(item)
-        read = False
-    elif pyproject.is_file():
-        pass
-    elif pyproject.is_dir():
-        pyproject /= "pyproject.toml"
-        if not pyproject.is_file:
-            error = True
-    else:
-        error = True
-
-    if error:
-        raise InvalidArgument(
-            f"{data=}; should be: pyproject.toml path, "
-            f"package name to search in Distribution or project; directory to add pyproject.toml"
-        )
-
-    if read:
-        conf = toml.load(pyproject)
-        deps = conf["project"]["dependencies"]
-        if extras:
-            ex = conf["project"]["optional-dependencies"]
-    if install:
-        if upgrade:
-            up = [
-                "--upgrade",
-            ]
-        if extras:
-            ex = list(ex.values())
-        executable = v / "bin/python" if (v := pyproject.parent / "venv").is_dir() else sys.executable
-        return subprocess.check_output(
-            [executable, "-m", "pip", "install", *up, "-q", *(deps + flatten(ex, recurse=True))]
-        ).decode()
-
-    rv = {"dependencies": deps} | ex
-    return {key: [packaging.requirements.Requirement(req) for req in value] for key, value in rv.items()}
-
-
-requirements = dependencies
 
 
 def dict_sort(
@@ -820,27 +489,6 @@ def dict_sort(
     return data
 
 
-def distribution(data: Optional[pathlib.Path | str] = None) -> importlib.metadata.Distribution:
-    """
-    Package installed version
-
-    Examples:
-        >>> from importlib.metadata import Distribution
-        >>> from huti.functions import distribution
-        >>>
-        >>> assert isinstance(distribution("rich"), Distribution)
-
-    Args:
-        data: package name or path to use basename (Default: `ROOT`)
-
-    Returns
-        Installed version
-    """
-    return suppress(
-        importlib.metadata.Distribution.from_name,
-        data if len(toiter(data, split="/")) == 1 else data.name,
-        exception=importlib.metadata.PackageNotFoundError,
-    )
 
 
 def dmg(src: Path | str, dest: Path | str) -> None:
@@ -962,50 +610,6 @@ def firstfound(data: Iterable, apply: Callable) -> Any:
     for i in data:
         if apply(i):
             return i
-
-
-def flatten(
-        data: tuple | list | set, recurse: bool = False, unique: bool = False, sort: bool = True
-) -> tuple | list | set:
-    """
-    Flattens an Iterable
-
-    Examples:
-        >>> from huti.functions import flatten
-        >>>
-        >>> assert flatten([1, 2, 3, [1, 5, 7, [2, 4, 1, ], 7, 6, ]]) == [1, 2, 3, 1, 5, 7, [2, 4, 1], 7, 6]
-        >>> assert flatten([1, 2, 3, [1, 5, 7, [2, 4, 1, ], 7, 6, ]], recurse=True) == [1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 7]
-        >>> assert flatten((1, 2, 3, [1, 5, 7, [2, 4, 1, ], 7, 6, ]), unique=True) == (1, 2, 3, 4, 5, 6, 7)
-
-    Args:
-        data: iterable
-        recurse: recurse
-        unique: when recurse
-        sort: sort
-
-    Returns:
-        Union[list, Iterable]:
-    """
-    if unique:
-        recurse = True
-
-    cls = data.__class__
-
-    flat = []
-    _ = [
-        flat.extend(flatten(item, recurse, unique) if recurse else item)
-        if isinstance(item, list)
-        else flat.append(item)
-        for item in data
-        if item
-    ]
-    value = set(flat) if unique else flat
-    if sort:
-        try:
-            value = cls(sorted(value))
-        except TypeError:
-            value = cls(value)
-    return value
 
 
 def framesimple(data: inspect.FrameInfo | types.FrameType | types.TracebackType) -> FrameSimple | None:
@@ -1141,42 +745,6 @@ def getstdout(func: Callable, *args: Any, ansi: bool = False, new: bool = True, 
         func(*args, **kwargs)
     return strip(buffer.getvalue(), ansi=ansi, new=new) if ansi or new else buffer.getvalue()
 
-
-def group_user(name: int | str = USER) -> GroupUser:
-    """
-    Group and User for Name (id if name is str and vice versa).
-
-    Examples:
-        >>> import os
-        >>> import pathlib
-        >>>
-        >>> from huti.functions import group_user
-        >>> from huti.variables import PW_USER, PW_ROOT
-        >>>
-        >>> s = pathlib.Path().stat()
-        >>> gr = group_user()
-        >>> assert gr.group == s.st_gid and gr.user == s.st_uid
-        >>> gr = group_user(name=PW_USER.pw_uid)
-        >>> actual_gname = gr.group
-        >>> assert gr.group != PW_ROOT.pw_name and gr.user == PW_USER.pw_name
-        >>> gr = group_user('root')
-        >>> assert gr.group != s.st_gid and gr.user == 0
-        >>> gr = group_user(name=0)
-        >>> assert gr.group != actual_gname and gr.user == 'root'
-
-    Args:
-        name: usename or id (default: `data.ACTUAL.pw_name`)
-
-    Returns:
-        GroupUser.
-    """
-    if isinstance(name, str):
-        struct = (
-            struct if name == (struct := PW_USER).pw_name or name == (struct := PW_ROOT).pw_name else pwd.getpwnam(name)
-        )
-        return GroupUser(group=struct.pw_gid, user=struct.pw_uid)
-    struct = struct if name == (struct := PW_USER).pw_uid or name == (struct := PW_ROOT).pw_uid else pwd.getpwuid(name)
-    return GroupUser(group=grp.getgrgid(struct.pw_gid).gr_name, user=struct.pw_name)
 
 
 def gz(src: Path | str, dest: Path | str = ".") -> Path:
@@ -1625,53 +1193,6 @@ def strip(obj: str | Iterable[str], ansi: bool = False, new: bool = True) -> str
         return rv(obj)
     return cls(rv(i) for i in obj)
 
-def suppress(func: Callable[P, T], *args: P.args, exception: ExcType | None = Exception, **kwargs: P.kwargs) -> T:
-    """
-    Try and supress exception.
-
-    Args:
-        func: function to call
-        *args: args to pass to func
-        exception: exception to suppress (default: Exception)
-        **kwargs: kwargs to pass to func
-
-    Returns:
-        result of func
-    """
-    with contextlib.suppress(exception or Exception):
-        return func(*args, **kwargs)
-
-
-def syssudo(user: str = "root") -> subprocess.CompletedProcess | None:
-    """
-    Rerun Program with sudo ``sys.executable`` and ``sys.argv`` if user is different that the current user
-
-    Arguments:
-        user: run as user (Default: False)
-
-    Returns:
-        CompletedProcess if the current user is not the same as user, None otherwise
-    """
-    if not ami(user):
-        return cmd(["sudo", "-u", user, sys.executable, *sys.argv])
-    return None
-
-
-def tag_latest(path: AnyPath = None) -> str:
-    """
-    latest tag
-
-    Examples:
-        >>> import huti
-        >>> from huti.functions import tag_latest
-        >>> from huti.functions import top
-        >>> t = top(huti)
-        >>> if t.top:
-        ...    assert tag_latest(huti.__file__) != ""
-
-    """
-    c = f"-C {parent(path)}" if path else ""
-    return stdout(f"git {c} describe --abbrev=0 --tags") or ""
 
 
 def tardir(src: Path | str) -> Path:
@@ -1789,196 +1310,4 @@ def tomodules(obj: Any, suffix: bool = True) -> str:
     """
     split = "/" if isinstance(obj, str) and "/" in obj else " "
     return ".".join(i.removesuffix(Path(i).suffix if suffix else "") for i in toiter(obj, split=split))
-
-
-def top(data: types.ModuleType | StrOrBytesPath | None = None) -> Top:
-    """
-    Get Top Level Package/Module Path.
-
-    Examples:
-        >>> import email.mime.application
-        >>> from pathlib import Path
-        >>> import pytest_cov
-        >>> import semantic_release.cli.commands
-        >>> import huti
-        >>> import huti.cli
-        >>> from huti.enums import PathSuffix, FileName
-        >>> from huti.functions import chdir, findup, parent, top
-        >>>
-        >>> with chdir(huti.__file__):
-        ...     t_top = top()
-        ...     assert "__init__.py" in str(t_top.init_py)
-        ...     assert "huti" == t_top.name
-        ...     assert "HUTI_" == t_top.prefix
-        ...     assert "huti.pth" in str(t_top.pth_source)  # doctest: +SKIP
-        ...     if t_top.installed:
-        ...         assert "site-packages" in str(t_top.init_py)
-        ...         assert "site-packages" in str(t_top.path)
-        ...         assert "site-packages" in str(t_top.pth_source)
-        ...         assert "site-packages" in str(t_top.root)
-        ...     else:
-        ...         assert t_top.pth is None
-        ...         assert "huti/pyproject.toml" in str(t_top.pyproject_toml)
-        ...         assert "huti/venv" in str(t_top.venv)
-        >>>
-        >>> t_module = top(huti)
-        >>> with chdir(huti.cli.__file__):
-        ...     t_cwd = top()
-        >>> t_cli = top(pathlib.Path(huti.cli.__file__).parent)
-        >>> assert t_module == t_cwd == t_cli
-        >>>
-        >>> t_semantic = top(semantic_release.cli)
-        >>> t_semantic  # doctest: +ELLIPSIS
-        Top(init_py=PosixPath('/.../site-packages/semantic_release/__init__.py'), \
-installed=True, name='semantic_release', \
-path=PosixPath('/.../site-packages/semantic_release'), \
-prefix='SEMANTIC_RELEASE_', pth=None, pth_source=None, \
-pyproject_toml=None, \
-root=PosixPath('/.../site-packages/semantic_release'), \
-top=..., \
-venv=...)
-        >>>
-        >>> t_pytest_cov = top(pytest_cov)
-        >>> t_pytest_cov  # doctest: +ELLIPSIS
-        Top(init_py=PosixPath('.../site-packages/pytest_cov/__init__.py'), \
-installed=True, name='pytest_cov', \
-path=PosixPath('.../site-packages/pytest_cov'), \
-prefix='PYTEST_COV_', \
-pth=PosixPath('.../site-packages/pytest-cov.pth'), \
-pth_source=None, \
-pyproject_toml=None, root=PosixPath('.../site-packages/pytest_cov'), \
-top=..., \
-venv=...)
-
-    Args:
-        data: ModuleType, directory or file name (default: None). None for cwd.
-
-    Raises:
-        AttributeError: __file__ not found.
-    """
-
-    if isinstance(data, types.ModuleType):
-        p = data.__file__
-    elif isinstance(data, (str, pathlib.Path, pathlib.PurePath)):
-        p = data
-    else:
-        p = os.getcwd()
-
-    init_py = installed = path = pth_source = pyproject_toml = None
-
-    start = parent(p)
-    root = None
-    t = None
-    if start and (t := superproject(start)):
-        root = pathlib.Path(t)
-    v = root / venv.__name__ if root else None
-
-    if start:
-        while True:
-            if (rv := start / FileName.INIT()).is_file():
-                init_py, path = rv, start
-            if (rv := start / FileName.PYPROJECT()).is_file():
-                pyproject_toml = rv
-            if any(
-                [
-                    start.name == "dist-packages",
-                    start.name == "site-packages",
-                    start.name == pathlib.Path(sys.executable).resolve().name,
-                    (start / "pyvenv.cfg").is_file(),
-                ]
-            ):
-                installed, root = True, start
-                break
-            finish = root.parent if root else None
-            if (start := start.parent) == (finish or pathlib.Path("/")):
-                break
-    root = pyproject_toml.parent if root is None and pyproject_toml else path
-    if pyproject_toml:
-        name = toml.load(pyproject_toml)["project"]["name"]
-    elif path:
-        name = path.name
-    else:
-        name = data
-
-    name_dash = name.replace("_", "-")
-
-    pths = getpths()
-
-    if path:
-        pth_source = (
-            pth_source
-            if (
-                    path
-                    and (
-                            ((pth_source := path / PathSuffix.PTH(name)).is_file())
-                            or ((pth_source := path / PathSuffix.PTH(name.replace("_", "-"))).is_file())
-                    )
-            )
-            else None
-        )
-
-    return Top(
-        init_py=init_py,
-        installed=installed,
-        name=name,
-        path=path,
-        prefix=f"{name.upper()}_",
-        pth=pths.get(name, pths.get(name_dash)),
-        pth_source=pathlib.Path(pth_source) if pth_source else None,
-        pyproject_toml=pyproject_toml,
-        root=root,
-        top=t,
-        venv=v,
-    )
-
-
-def tox() -> bool:
-    """running in tox"""
-    return ".tox" in sysconfig.get_paths()["purelib"]
-
-
-def version(data: types.ModuleType | pathlib.Path | str | None = None) -> str:
-    """
-    Package installed version
-
-    Examples:
-        >>> import IPython
-        >>> import semver
-        >>> import huti
-        >>> from huti.functions import version
-        >>>
-        >>> if (ver := version(huti)) and "dev" not in ver:
-        ...     assert semver.VersionInfo.parse(version(huti))
-        >>> assert semver.VersionInfo.parse(version(IPython))  # __version__
-        >>> assert version(semver) == version(semver.__file__) == version(pathlib.Path(semver.__file__).parent) \
-            == version("semver")
-        >>> assert semver.VersionInfo.parse(version(semver))
-
-    Arguments:
-        data: module to search for __version__ or use name, package name oir path.name (Default: `PROJECT`)
-
-    Returns
-        Installed version
-    """
-    if isinstance(data, types.ModuleType) and hasattr(data, "__version__"):
-        return data.__version__
-
-    t = top(data)
-    if isinstance(data, str) and "/" not in data:
-        name = data
-    elif isinstance(data, types.ModuleType):
-        name = data.__name__
-    else:
-        name = t.name
-
-    if t.pyproject_toml:
-        if (v := toml.load(t.pyproject_toml).get("project", {}).get("version")) is None and t.root:
-            v = tag_latest(t.root)
-        if t.name == name:
-            return v
-
-    if not name:
-        raise InvalidArgument(f"name is required: {data=}")
-
-    return suppress(importlib.metadata.version, name, exception=importlib.metadata.PackageNotFoundError)
 
