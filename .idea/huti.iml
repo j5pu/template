@@ -23,6 +23,7 @@
     <orderEntry type="module" module-name="bbin" />
     <orderEntry type="module" module-name="pths" />
     <orderEntry type="module" module-name="ppip" />
+    <orderEntry type="module" module-name="pdf" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />

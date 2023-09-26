@@ -158,9 +158,7 @@ class ProjectBase:
             self.name = data
         if not data:
             top = subprocess.getoutput('git rev-parse --show-toplevel')
-            if top:
-                self.top = Path(top).resolve()
-
+t
     @classmethod
     def from_name(cls, name: str = HUTI_ROOT) -> 'ProjectBase':
         """
