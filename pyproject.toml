@@ -92,7 +92,7 @@ requirements = "huti.cli.dependencies:app"
 huti = "huti.cli.app:app"
 
 [build-system]
-requires = ['pths', 'setuptools', 'setuptools_scm', 'wheel']
+requires = ['setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
