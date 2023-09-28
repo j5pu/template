@@ -16,7 +16,6 @@ dependencies = [
     "loguru-config >=0.1.0, <1",
     "packaging >= 23.1, <24",
     "pillow >= 10.0.0, <11",
-    "pths >= 0.1.0, <1",
     "PyMuPDF >= 1.23.3, <2",
     "pymupdf-fonts >= 1.0.5, <2",
     "requests >= 2.31.0, <3",
