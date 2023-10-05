@@ -13,7 +13,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="sitec" />
     <orderEntry type="module" module-name="puntos" />
-    <orderEntry type="module" module-name="gitp" />
     <orderEntry type="module" module-name="bapy" />
     <orderEntry type="module" module-name="rclib" />
     <orderEntry type="module" module-name="sstr" />
@@ -24,6 +23,9 @@
     <orderEntry type="module" module-name="pths" />
     <orderEntry type="module" module-name="ppip" />
     <orderEntry type="module" module-name="pdf" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="$MODULE_DIR$/pyproject.toml" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />

@@ -20,9 +20,3 @@ class CommandNotFound(HutiBaseError):
     Raised when function is called with invalid argument
     """
 
-
-class InvalidArgument(HutiBaseError):
-    """
-    Raised when function is called with invalid argument
-    """
-
