@@ -1,86 +1,104 @@
-target-version = "py37"
-line-length = 120
+exclude = ["docs", "tests"]
+include = ["src/**"]
 fix = true
+ignore-init-module-imports = true
+ignore = [
+    "C901", # is too complex
+    "E741", # Ambiguous variable name: `l`
+    "F403", # `from module import *` used; unable to detect undefined names
+    "N805", # First argument of a method should be named `self`
+    "PLR0913", # Too many arguments to function call (6 > 5)
+    "PLW1510", # `subprocess.run` without explicit `check` argument
+    "S602", # `subprocess` call with `shell=True` identified, security issue
+    "S603", # `subprocess` call: check for execution of untrusted input
+    "S607", # Starting a process with a partial executable path
+    "SLF001", # Access to protected
+    "T201", # `print` found
+    "TID252", # relative imports
+    "TRY003", # long messages outside the exception class
+    "W505", # Doc line too long (102 > 100 characters)
+]
+line-length = 120
+
 select = [
-    # flake8-2020
-    "YTT",
-    # flake8-bandit
-    "S",
-    # flake8-bugbear
-    "B",
     # flake8-builtins
     "A",
+    "ASYNC",
+    # flake8-bugbear
+    "B",
+    "BLE",
     # flake8-comprehensions
     "C4",
-    # flake8-debugger
-    "T10",
-    # flake8-simplify
-    "SIM",
-    # isort
-    "I",
     # mccabe
     "C90",
+    "D",
+    "DTZ",
+    # flake8-2020
+    "E",
+    "EM",
+    "ERA",
     # pycodestyle
-    "E", "W",
-    # pyflakes
     "F",
+    "FLY",
+    "G",
+    # isort
+    "I",
+    "ICN",
+    "INP",
+    "ISC",
+    "N",
+    "NPY",
     # pygrep-hooks
     "PGH",
-    # pyupgrade
-    "UP",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "PT",
+    "PTH",
+    "PYI",
+    "RET",
+    "RSE",
     # ruff
     "RUF",
+    # flake8-bandit
+    "S",
+    # flake8-simplify
+    "SIM",
+    "SLF",
+    # flake8-debugger
+    "T10",
+    "T20",
+    "TCH",
+    "TID",
     # tryceratops
     "TRY",
+    # pyupgrade
+    "UP",
+    # flake8-2020
+    "W",
+    # pyflakes
+    "YTT",
 ]
-
-ignore = [
-    # is too comple
-    "C901",
-    # `subprocess` call: check for execution of untrusted input
-    "S603",
-    # long messages outside the exception class
-    "TRY003"
+src = ["src"]
+target-version = "py311"
+unfixable = [
+    "T201", # `print` found
 ]
 
 [per-file-ignores]
-"src/huti/__init__.py" = [
-    # unable to detect undefined names
-    "F403",
-]
-"src/huti/classes.py" = [
-    # is too complex
-    "A003",
-]
-"src/huti/classes.pyi" = [
-    # shadowing a Python builtin
-    "A003",
-    "RUF001",
-]
-"src/huti/color.py" = [
-    # shadowing a Python builtin
-    "A002",
-    # ,String contains ambiguous
-    "RUF001",
-]
-"src/huti/color.pyi" = [
-    # shadowing a Python builtin
-    "A002",
-]
-"src/huti/env/__init__.py" = [
-    # unable to detect undefined names
-    "F403",
-]
-"src/huti/functions.py" = [
-    # `subprocess` call with `shell=True` identified, security issue
-    "S602",
-    # Starting a process with a partial executable path
-    "S607",
-    # tandard pseudo-random generators are not suitable for cryptographic purposes
-    "S311"
-]
-"src/huti/path.pyi" = [
-    # shadowing a Python builtin
-    "A003"
+"src/nodeps/nodeps.pth" = [
+    "D100",  # Missing docstring in public module
+    "I001",  # Import block is un-sorted or un-formatted
+    "E702",  # Multiple statements on one line (semicolon)
 ]
 
+[flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[pycodestyle]
+max-doc-length = 100
+
+[pydocstyle]
+convention = "google"

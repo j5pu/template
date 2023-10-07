@@ -1,7 +1,0 @@
-brew "exiftool"
-brew "ghostscript"
-brew "imagemagick"
-brew "poppler"
-brew "qpdf"
-brew "tesseract"
-brew "tesseract-lang"

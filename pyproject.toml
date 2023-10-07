@@ -1,102 +1,26 @@
 [project]
+dependencies = []
 name = "huti"
 description = "Python helpers and utilities"
 dynamic = ["version"]
-license = { text = "MIT" }
-requires-python = ">=3.10"
-dependencies = [
-    "beautifulsoup4 >= 4.12.2, <5",
-    "fonttools >= 4.42.1, <5",
-    "furl >= 2.1.3, <3",
-    "ghapi >= 1.0.4, <2",
-    "gitpython >= 3.1.36, <4",
-    "jsonpickle >= 3.0.2, <4",
-    "hunter >= 3.6.1, <4",
-    "loguru >=0.7.2, <1",
-    "loguru-config >=0.1.0, <1",
-    "packaging >= 23.1, <24",
-    "pillow >= 10.0.0, <11",
-    "PyMuPDF >= 1.23.3, <2",
-    "pymupdf-fonts >= 1.0.5, <2",
-    "requests >= 2.31.0, <3",
-    "rich >= 13.5, <14",
-    "semver >=3.0.1, <4",
-    "setuptools >= 68.2.2, <69",
-    "strip-ansi >=0.1.1, <1",
-    "structlog >=23.1.0, <24",
-    "toml >=0.10.2, <1",
-    "typer[all] >= 0.9, <1"
-]
+readme = "README.md"
+requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = [
-    "black", # pipx
-    "icecream",
-    "ipython", # pipx
-    "ipython-suggestions",
-    "restmagic",
-    "mypy",
-    "pip-tools", # pipx
-    "pyflyby",
-    "python-semantic-release",
-    "ruff", # pipx
-    "ruff-lsp", # pipx
-    "twine", # pipx
-    "vendorize"
+    "pproj[all]",
 ]
-docs = [
-    "docutils", # pipx
-    "sphinx", # pipx
-    "sphinx-click",
-    "sphinx-rtd-theme",
-    "sphinxcontrib-napoleon"
-]
-tests = [
-    "coverage[toml] >=6, <7", # pipx
-    "darglint >=1.8.1, <2", # pipx
-    "environs >=9.5.0, <10",
-    "pydocstyle >=6.3, <7", # pipx
-    "pytest >=7, <8", # pipx
-    "pytest-asyncio >=0.21.1, <1",
-    "pytest-cov >=4, <5",
-    "pytest-doctestplus >=0.13, <1",
-    "pytest-github-actions-annotate-failures",
-    "pytest-mock >=3, <4",
-    "pytest-xdist >=2, <3",
-    "pytest-remotedata >=0.4.0, <1",
-    "pytest-lazy-fixture ~=0.6.3",
-    "pytest-sugar >=0.9.7, <1",
-    "responses==0.21.0",
-    "requests-mock >=1.10.0, <2",
-    "ruff >=0.0.282, <0.1", # pipx
-    "tox >=4.6.4, <5", # pipx
-    "types-pytest-lazy-fixture >=0.6.3.3",
-]
-[tool.setuptools.package-data]
-"huti.data" = ["**/*.pdf", "Brewfile"]
-"huti" = ["*.pth"]
 
-#[tool.setuptools]
-#package-dir = { "" = "src" }
-#packages = ["huti"]
-##
-[tool.setuptools.packages.find]
-where = ["src"]  # ["."] by default
-exclude = ['huti.cli', 'huti.env', 'huti.data', 'huti.data.generated', 'huti.data.tests', 'huti.data.tests.generated']
+[[project.authors]]
+name = "José Antonio Puértolas Montañés"
+email = "63794670+j5pu@users.noreply.github.com"
 
-namespaces = false
+[project.urls]
+Homepage = "https://github.com/j5pu/huti"
 
-[project.scripts]
-dependencies = "huti.cli.dependencies:app"
-requirements = "huti.cli.dependencies:app"
-huti = "huti.cli.app:app"
-
+[project.license]
+text = "MIT"
 [build-system]
 requires = ['setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
-
-[tool.semantic_release]
-build_command = "python -m build --wheel"
-tag_format = "{version}"
-

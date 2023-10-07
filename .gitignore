@@ -1,5 +1,4 @@
-generated
-./huti-*
+reports
 .ruff_cache
 
 ### macOS template
@@ -189,3 +188,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+!/reports/

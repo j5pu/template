@@ -1,70 +1,64 @@
-.PHONY: clean publish tests version
+.PHONY: docs tests venv
 
-msg := fix: $(shell git status --porcelain | grep -v "^??" | cut -c4- | tr '\n' ' ')
-SHELL := $(shell bash -c 'command -v bash')
-ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-PYTHONPATH := $(ROOT_DIR)/src
-SUDOC := /usr/bin/sudo
-export msg
-export PYTHONPATH
-export SUDOC
+browser:
+	@$@
 
-brew:
-	@brew bundle --file=src/huti/data/Brewfile --no-lock --quiet
-
-build: clean
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m build --wheel
+build:  # run: write, docs, clean and venv (requirements)
+	@$@
 
 clean:
-	@sudo rm -rf build dist **/*.egg-info *.egg-info .mypy_cache .pytest_cache .tox **/scanned_*.pdf **/generated_*.pdf \
-		 ./huti-*  .coverage .ruff_cache
+	@$@
 
-commit: tests tox
-	@git add -A .
-	@git commit --quiet -a -m "$${msg:-fix:}" || true
+commit: tests
+	@$@
+
+completions:
+	@$@
 
 coverage:
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && coverage run -m pytest && coverage report
+	@proj $@
 
-lint:
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && ruff check src
+docs:
+	@$@
 
-publish: tag
-	@make build
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && twine upload -u __token__ dist/*
-	@git push --tags --quiet || true
-	@make clean
+latest:
+	@$@
 
+next:
+	@$@
 
-requirements:
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && test -d venv || python3.11 -m venv venv
-	@venv/bin/python -c "from huti.cli.dependencies import dependencies; dependencies()"
-#	@{ [ "$${CI-}" ] || source venv/bin/activate; } && python3 -m pip install --upgrade pip pip-tools && \
-#		pip-compile --all-extras --no-annotate --quiet -o /tmp/requirements.txt pyproject.toml && \
-#		python3 -m pip  install -r /tmp/requirements.txt
+pproj:
+	@python3 -m pip install --upgrade -q $@
 
-tag: commit
-	@NEXT=$$(svu next --strip-prefix) && \
-		CURRENT=$$(svu --strip-prefix) && \
-		TAG=$$(git tag --list --sort=-v:refname | head -n1) && \
-		{ test $$NEXT != $$CURRENT || test $$NEXT != $$TAG; } && \
-		CHANGED=1 && echo $$CURRENT $$NEXT $$TAG && \
-		git tag $$NEXT && \
-		git push --quiet --tags  || true
+publish:  # runs: docs, tests (build (clean, venv (requirements)), pytest, ruff & tox), commit, tag, push, twine & clean
+	@$@
 
 pyenv:
-	@pyenv install 3.10
 	@pyenv install 3.11
 	@pyenv install 3.12-dev
 
-secrets:
-	@gh secret set GH_TOKEN --body "$$GITHUB_TOKEN"
-	@grep -v GITHUB_ /Users/j5pu/secrets/profile.d/secrets.sh > /tmp/secrets
-	@gh secret set -f  /tmp/secrets
+pytest:
+	@proj $@
 
-tests: lint build
-	@{ [ "$${CI-}" ] || source venv/bin/activate; } && pytest
+requirements:
+	@$@ --install
+
+ruff:
+	@proj $@
+
+secrets:
+	@$@
+
+tests:  # runs: build (clean, venv (requirements)), pytest, ruff and tox
+	@$@
 
 tox:
-	@eval "$$(pyenv init --path)";{  [ "$${CI-}" ] || source venv/bin/activate; } && \
-		PY_IGNORE_IMPORTMISMATCH=1 tox -p auto
+	@proj $@
+
+twine:
+	@proj $@
+
+venv:  # runs: requirements
+	@$@
+
+.DEFAULT_GOAL := publish

@@ -1,3 +1,0 @@
-"""
-huti.cli Module
-"""

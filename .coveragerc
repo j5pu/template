@@ -1,6 +1,10 @@
 [html]
-directory = "coverage_html_report"
+directory = reports
 [report]
 skip_empty = true
 [run]
-source = "src"
+source = src
+branch = true
+data_file = reports/.coverage
+[xml]
+output = reports/coverage.xml
