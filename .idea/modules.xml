@@ -4,15 +4,11 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../Archive/bapy/.idea/bapy.iml" filepath="$PROJECT_DIR$/../Archive/bapy/.idea/bapy.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/bbin/.idea/bbin.iml" filepath="$PROJECT_DIR$/../Archive/bbin/.idea/bbin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../gitp/.idea/gitp.iml" filepath="$PROJECT_DIR$/../gitp/.idea/gitp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/huti.iml" filepath="$PROJECT_DIR$/.idea/huti.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/template.iml" filepath="$PROJECT_DIR$/.idea/template.iml" />
       <module fileurl="file://$PROJECT_DIR$/../pdf/.idea/pdf.iml" filepath="$PROJECT_DIR$/../pdf/.idea/pdf.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Downloads/ppip/.idea/ppip.iml" filepath="$PROJECT_DIR$/../Downloads/ppip/.idea/ppip.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/data/prel/.idea/prel.iml" filepath="$PROJECT_DIR$/../Archive/data/prel/.idea/prel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../pths/.idea/pths.iml" filepath="$PROJECT_DIR$/../pths/.idea/pths.iml" />
       <module fileurl="file://$PROJECT_DIR$/../puntos/.idea/puntos.iml" filepath="$PROJECT_DIR$/../puntos/.idea/puntos.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/data/rclib/.idea/rclib.iml" filepath="$PROJECT_DIR$/../Archive/data/rclib/.idea/rclib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../sitec/.idea/sitec.iml" filepath="$PROJECT_DIR$/../sitec/.idea/sitec.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/data/sstr/.idea/sstr.iml" filepath="$PROJECT_DIR$/../Archive/data/sstr/.idea/sstr.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/turbogit/.idea/turbogit.iml" filepath="$PROJECT_DIR$/../Archive/turbogit/.idea/turbogit.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Archive/data/upins/.idea/upins.iml" filepath="$PROJECT_DIR$/../Archive/data/upins/.idea/upins.iml" />

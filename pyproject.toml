@@ -3,28 +3,14 @@ dependencies = [
     "nodeps[pretty]",
     "typer[all] >= 0.9, <1",
 ]
-name = "huti"
-description = "Python helpers and utilities"
-dynamic = ["version"]
-readme = "README.md"
-requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = [
-    "pproj[all]",
+    "nodeps[all,dev]",
 ]
 
 [project.scripts]
-huti-test = "huti.__main__:app"
+template-test = "template.__main__:app"
 
-[[project.authors]]
-name = "José Antonio Puértolas Montañés"
-email = "63794670+j5pu@users.noreply.github.com"
-
-[project.urls]
-Homepage = "https://github.com/j5pu/huti"
-
-[project.license]
-text = "MIT"
 [build-system]
 requires = ["nodeps", 'setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'

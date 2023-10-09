@@ -1,9 +1,11 @@
-.PHONY: docs tests venv
-
 browser:
 	@$@
 
+.PHONY: build
 build:  # run: write, docs, clean and venv (requirements)
+	@$@
+
+builds:  # run: write, docs, clean and venv (requirements)
 	@$@
 
 clean:
@@ -18,6 +20,7 @@ completions:
 coverage:
 	@proj $@
 
+.PHONY: docs
 docs:
 	@$@
 
@@ -27,8 +30,8 @@ latest:
 next:
 	@$@
 
-pproj:
-	@python3 -m pip install --upgrade -q $@
+nodeps:
+	@python3 -m pip install --upgrade -q $@[all,dev]
 
 publish:  # runs: docs, tests (build (clean, venv (requirements)), pytest, ruff & tox), commit, tag, push, twine & clean
 	@$@
@@ -40,8 +43,14 @@ pyenv:
 pytest:
 	@proj $@
 
-requirements:
+pytests:
+	@$@
+
+requirement:
 	@$@ --install
+
+requirements:
+	@$@
 
 ruff:
 	@proj $@
@@ -49,6 +58,10 @@ ruff:
 secrets:
 	@$@
 
+test:
+	@proj $@
+
+.PHONY: tests
 tests:  # runs: build (clean, venv (requirements)), pytest, ruff and tox
 	@$@
 
@@ -58,7 +71,11 @@ tox:
 twine:
 	@proj $@
 
+.PHONY: venv
 venv:  # runs: requirements
+	@$@
+
+venvs:  # runs: requirements
 	@$@
 
 .DEFAULT_GOAL := publish

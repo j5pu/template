@@ -1,21 +1,21 @@
-# Huti
+# Template
 
-[![PyPI](https://img.shields.io/pypi/v/huti.svg)][pypi status]
-[![Status](https://img.shields.io/pypi/status/huti.svg)][pypi status]
-[![Python Version](https://img.shields.io/pypi/pyversions/huti)][pypi status]
-[![License](https://img.shields.io/pypi/l/huti)][license]
+[![PyPI](https://img.shields.io/pypi/v/template.svg)][pypi status]
+[![Status](https://img.shields.io/pypi/status/template.svg)][pypi status]
+[![Python Version](https://img.shields.io/pypi/pyversions/template)][pypi status]
+[![License](https://img.shields.io/pypi/l/template)][license]
 
-[![Read the documentation at https://sbit.readthedocs.io/](https://img.shields.io/readthedocs/huti/latest.svg?label=Read%20the%20Docs)][read the docs]
-[![Tests](https://github.com/j5pu/huti/workflows/Tests/badge.svg)][tests]
-[![Codecov](https://codecov.io/gh/j5pu/huti/branch/main/graph/badge.svg)][codecov]
+[![Read the documentation at https://sbit.readthedocs.io/](https://img.shields.io/readthedocs/template/latest.svg?label=Read%20the%20Docs)][read the docs]
+[![Tests](https://github.com/j5pu/template/workflows/Tests/badge.svg)][tests]
+[![Codecov](https://codecov.io/gh/j5pu/template/branch/main/graph/badge.svg)][codecov]
 
-[pypi status]: https://pypi.org/project/huti/
+[pypi status]: https://pypi.org/project/template/
 
-[read the docs]: https://huti.readthedocs.io/
+[read the docs]: https://template.readthedocs.io/
 
-[tests]: https://github.com/j5pu/huti/actions?workflow=Tests
+[tests]: https://github.com/j5pu/template/actions?workflow=Tests
 
-[codecov]: https://app.codecov.io/gh/j5pu/huti
+[codecov]: https://app.codecov.io/gh/j5pu/template
 
 [pre-commit]: https://github.com/pre-commit/pre-commit
 
@@ -25,16 +25,16 @@
 
 ## Installation
 
-You can install _huti_ via [pip] from [PyPI]:
+You can install _template_ via [pip] from [PyPI]:
 
 ```console
-$ pip install huti
+$ pip install template
 ```
 
 ## License
 
 Distributed under the terms of the [MIT license][license],
-_huti_ is free and open source software.
+_template_ is free and open source software.
 
 ## Issues
 
@@ -54,3 +54,5 @@ please [file an issue] along with a detailed description.
 <!-- github-only -->
 
 [license]: https://github.com/j5pu/pproj/blob/main/LICENSE
+
+[command-line reference]: https://nodeps.readthedocs.io/en/latest/usage.html

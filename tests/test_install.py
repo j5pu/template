@@ -1,12 +1,12 @@
 import sysconfig
 from pathlib import Path
 
-import huti
+import template
 
 from pip._internal.cli.main import main as _main
 
 ROOT = Path(__file__).parent.parent
-PACKAGE = huti.__name__
+PACKAGE = template.__name__
 
 
 def setup_module(module):

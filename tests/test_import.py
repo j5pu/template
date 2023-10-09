@@ -1,6 +1,6 @@
-import huti
+import template
 
 
 def test_import() -> None:
     """Test that the package can be imported."""
-    assert isinstance(huti.__name__, str)
+    assert isinstance(template.__name__, str)
