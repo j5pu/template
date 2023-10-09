@@ -1,5 +1,8 @@
 [project]
-dependencies = []
+dependencies = [
+    "nodeps[pretty]",
+    "typer[all] >= 0.9, <1",
+]
 name = "huti"
 description = "Python helpers and utilities"
 dynamic = ["version"]
@@ -9,6 +12,9 @@ requires-python = ">=3.11"
 dev = [
     "pproj[all]",
 ]
+
+[project.scripts]
+huti-test = "huti.__main__:app"
 
 [[project.authors]]
 name = "José Antonio Puértolas Montañés"
@@ -20,7 +26,7 @@ Homepage = "https://github.com/j5pu/huti"
 [project.license]
 text = "MIT"
 [build-system]
-requires = ['setuptools', 'setuptools_scm', 'wheel']
+requires = ["nodeps", 'setuptools', 'setuptools_scm', 'wheel']
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
