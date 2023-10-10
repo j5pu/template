@@ -3,6 +3,7 @@ dependencies = [
     "nodeps[pretty]",
     "typer[all] >= 0.9, <1",
 ]
+
 [project.optional-dependencies]
 dev = [
     "nodeps[all,dev]",
@@ -10,6 +11,10 @@ dev = [
 
 [project.scripts]
 template-test = "template.__main__:app"
+
+
+[project.urls]
+Homepage = "https://github.com/j5pu/template"
 
 [build-system]
 requires = ["nodeps", 'setuptools', 'setuptools_scm', 'wheel']

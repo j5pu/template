@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="RuffConfigService">
-    <option name="projectRuffExecutablePath" value="$PROJECT_DIR$/../ppath/venv/bin/ruff" />
-    <option name="projectRuffLspExecutablePath" value="$PROJECT_DIR$/../ppath/venv/bin/ruff-lsp" />
+    <option name="globalRuffLspExecutablePath" value="/usr/local/bin/ruff" />
+    <option name="projectRuffExecutablePath" value="$PROJECT_DIR$/../pdf/venv/bin/ruff" />
+    <option name="projectRuffLspExecutablePath" value="$PROJECT_DIR$/../pdf/venv/bin/ruff-lsp" />
   </component>
 </project>

@@ -1,3 +1,6 @@
+brew:
+	@p $@
+
 browser:
 	@$@
 
@@ -18,7 +21,7 @@ completions:
 	@$@
 
 coverage:
-	@proj $@
+	@p $@
 
 .PHONY: docs
 docs:
@@ -36,12 +39,20 @@ nodeps:
 publish:  # runs: docs, tests (build (clean, venv (requirements)), pytest, ruff & tox), commit, tag, push, twine & clean
 	@$@
 
+push:
+	@rm -f docs/conf.py docs/requirements.txt docs/reference.md
+	@git add .
+	@git commit --quiet -a -m "$${msg:-fix}" || true
+	@git tag $$(svu next --strip-prefix)
+	@git push --quiet --tags
+	@git push --quiet
+
 pyenv:
 	@pyenv install 3.11
 	@pyenv install 3.12-dev
 
 pytest:
-	@proj $@
+	@p $@
 
 pytests:
 	@$@
@@ -53,23 +64,23 @@ requirements:
 	@$@
 
 ruff:
-	@proj $@
+	@p $@
 
 secrets:
 	@$@
 
 test:
-	@proj $@
+	@p $@
 
 .PHONY: tests
 tests:  # runs: build (clean, venv (requirements)), pytest, ruff and tox
 	@$@
 
 tox:
-	@proj $@
+	@p $@
 
 twine:
-	@proj $@
+	@p $@
 
 .PHONY: venv
 venv:  # runs: requirements
@@ -77,5 +88,8 @@ venv:  # runs: requirements
 
 venvs:  # runs: requirements
 	@$@
+
+write:
+	@p $@
 
 .DEFAULT_GOAL := publish

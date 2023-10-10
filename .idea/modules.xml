@@ -2,16 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../Archive/bapy/.idea/bapy.iml" filepath="$PROJECT_DIR$/../Archive/bapy/.idea/bapy.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Archive/bbin/.idea/bbin.iml" filepath="$PROJECT_DIR$/../Archive/bbin/.idea/bbin.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/template.iml" filepath="$PROJECT_DIR$/.idea/template.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../pdf/.idea/pdf.iml" filepath="$PROJECT_DIR$/../pdf/.idea/pdf.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Archive/data/prel/.idea/prel.iml" filepath="$PROJECT_DIR$/../Archive/data/prel/.idea/prel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../puntos/.idea/puntos.iml" filepath="$PROJECT_DIR$/../puntos/.idea/puntos.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Archive/data/rclib/.idea/rclib.iml" filepath="$PROJECT_DIR$/../Archive/data/rclib/.idea/rclib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Archive/data/sstr/.idea/sstr.iml" filepath="$PROJECT_DIR$/../Archive/data/sstr/.idea/sstr.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Archive/turbogit/.idea/turbogit.iml" filepath="$PROJECT_DIR$/../Archive/turbogit/.idea/turbogit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Archive/data/upins/.idea/upins.iml" filepath="$PROJECT_DIR$/../Archive/data/upins/.idea/upins.iml" />
     </modules>
   </component>
 </project>
