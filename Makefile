@@ -42,7 +42,7 @@ publish:  # runs: docs, tests (build (clean, venv (requirements)), pytest, ruff 
 push:
 	@rm -f docs/conf.py docs/requirements.txt docs/reference.md
 	@git add .
-	@git commit --quiet -a -m "$${msg:-fix}" || true
+	@git commit --quiet -a -m "$${msg:-fix:}" || true
 	@git tag $$(svu next --strip-prefix)
 	@git push --quiet --tags
 	@git push --quiet
